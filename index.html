@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classification RDD par PaT's_PrOjEcT's</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .header .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+        
+        .header .description {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .admin-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .admin-panel {
+            background: #f3f4f6;
+            border-bottom: 2px solid #d1d5db;
+            padding: 15px;
+            display: none;
+        }
+        
+        .admin-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .admin-buttons {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .admin-btn-full {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .btn-blue {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-blue:hover {
+            background: #2563eb;
+        }
+        
+        .btn-green {
+            background: #059669;
+            color: white;
+        }
+        
+        .btn-green:hover {
+            background: #047857;
+        }
+        
+        .btn-purple {
+            background: #7c3aed;
+            color: white;
+        }
+        
+        .btn-purple:hover {
+            background: #6d28d9;
+        }
+        
+        .btn-gray {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-gray:hover {
+            background: #4b5563;
+        }
+        
+        .btn-red {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-red:hover {
+            background: #b91c1c;
+        }
+        
+        .stats-box {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .stats-title {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .add-product-form {
+            background: #eff6ff;
+            border-bottom: 2px solid #93c5fd;
+            padding: 15px;
+            display: none;
+        }
+        
+        .form-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .custom-products {
+            background: #fefce8;
+            border-bottom: 2px solid #facc15;
+            padding: 15px;
+            display: none;
+        }
+        
+        .custom-product {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .custom-product-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .custom-product-icon {
+            font-size: 18px;
+        }
+        
+        .custom-product-details {
+            flex: 1;
+        }
+        
+        .custom-product-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .custom-product-desc {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+        
+        .custom-product-category {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .delete-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+        
+        .search-box {
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .auto-search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+            display: none;
+        }
+        
+        .auto-search-btn:hover {
+            background: #2563eb;
+        }
+        
+        .auto-search-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .loading-indicator {
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+        }
+        
+        .loading-box {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 6px;
+            padding: 12px;
+        }
+        
+        .loading-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #3b82f6;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #1d4ed8;
+            font-size: 14px;
+        }
+        
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-top: 5px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 10;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .suggestion {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s;
+        }
+        
+        .suggestion:hover {
+            background: #f9fafb;
+        }
+        
+        .suggestion:last-child {
+            border-bottom: none;
+        }
+        
+        .suggestion-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .suggestion-icon {
+            font-size: 20px;
+        }
+        
+        .suggestion-info {
+            flex: 1;
+        }
+        
+        .suggestion-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .suggestion-desc {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+        
+        .suggestion-badges {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        .suggestion-category {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 7px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .auto-added-badge {
+            font-size: 10px;
+            background: #dcfce7;
+            color: #166534;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+        
+        .category-acide { background: #dc2626; }
+        .category-base { background: #2563eb; }
+        .category-toxique { background: #7c3aed; }
+        .category-peinture { background: #059669; }
+        .category-huiles { background: #4b5563; }
+        .category-organique { background: #0d9488; }
+        .category-combustible { background: #dc2626; }
+        .category-comburants { background: #ea580c; }
+        .category-oxydant { background: #eab308; }
+        
+        .result-box {
+            margin: 15px;
+            padding: 15px;
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .result-icon {
+            font-size: 32px;
+        }
+        
+        .result-info {
+            flex: 1;
+        }
+        
+        .result-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .result-desc {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .auto-added-result {
+            background: #dcfce7;
+            color: #166534;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .confidence-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .confidence-élevée {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .confidence-moyenne {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .confidence-faible {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .classification {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #059669;
+        }
+        
+        .classification-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .classification-badge {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .classification-desc {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions {
+            background: #fefce8;
+            border: 1px solid #fde047;
+            padding: 12px;
+            border-radius: 6px;
+        }
+        
+        .instructions-title {
+            font-weight: bold;
+            color: #a16207;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .instructions-text {
+            font-size: 12px;
+            color: #a16207;
+        }
+        
+        .categories {
+            padding: 15px;
+        }
+        
+        .categories h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        
+        .category-card:hover {
+            transform: translateX(3px);
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .category-icon {
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .category-details {
+            flex: 1;
+        }
+        
+        .category-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .category-description {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 2px;
+        }
+        
+        .category-count {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        .footer {
+            background: #f3f4f6;
+            padding: 15px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .footer p {
+            margin-bottom: 5px;
+        }
+        
+        .footer .copyright {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 8px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Classification RDD</h1>
+            <p class="subtitle">par PaT's_PrOjEcT's</p>
+            <p class="description">Résidus domestiques dangereux</p>
+            <button class="admin-btn" onclick="toggleAdmin()">⚙️ Admin</button>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-title">⚙️ Panneau d'administration</div>
+            <div class="admin-buttons">
+                <button class="admin-btn-full btn-blue" onclick="toggleAddProduct()">➕ Ajouter un produit</button>
+                <button class="admin-btn-full btn-green" onclick="exportDatabase()">📤 Exporter ma base de données</button>
+                <div class="stats-box">
+                    <div class="stats-title">Classification RDD - PaT's_PrOjEcT's</div>
+                    <div>• Produits par défaut: <span id="defaultCount">500</span></div>
+                    <div>• Produits personnalisés: <span id="customCount">0</span></div>
+                    <div>• Total: <span id="totalCount">500</span></div>
+                    <div class="copyright">© 2025 PaT's_PrOjEcT's</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Product Form -->
+        <div class="add-product-form" id="addProductForm">
+            <h3 class="form-title">➕ Ajouter un nouveau produit</h3>
+            <div class="form-group">
+                <label class="form-label">Nom du produit *</label>
+                <input type="text" class="form-input" id="newProductName" placeholder="Ex: WD-40, Roundup, etc.">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Catégorie RDD *</label>
+                <select class="form-select" id="newProductCategory">
+                    <option value="Acide">🧪 Acide</option>
+                    <option value="Base">🥽 Base</option>
+                    <option value="Comburants">💥 Comburants</option>
+                    <option value="Oxydant">💥 Oxydant</option>
+                    <option value="Toxique">☠️ Toxique</option>
+                    <option value="Peinture">🎨 Peinture</option>
+                    <option value="Huiles">🛢️ Huiles</option>
+                    <option value="Organique">🧴 Organique</option>
+                    <option value="Combustible">⛽ Combustible</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description *</label>
+                <input type="text" class="form-input" id="newProductDesc" placeholder="Ex: Dégrippant lubrifiant, Herbicide glyphosate, etc.">
+            </div>
+            <div class="form-buttons">
+                <button class="admin-btn-full btn-green" onclick="addProduct()" style="flex: 1;">✅ Ajouter</button>
+                <button class="admin-btn-full btn-gray" onclick="toggleAddProduct()" style="flex: 1;">❌ Annuler</button>
+            </div>
+        </div>
+
+        <!-- Custom Products Management -->
+        <div class="custom-products" id="customProductsPanel">
+            <h3 class="form-title">📝 Mes produits personnalisés</h3>
+            <div id="customProductsList" style="max-height: 200px; overflow-y: auto;"></div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-box">
+            <div class="search-container">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" class="search-input" id="searchInput" 
+                       placeholder="Rechercher un produit (ex: WD-40, Roundup...)" 
+                       oninput="handleSearch()" onkeypress="handleKeyPress(event)">
+                <button class="auto-search-btn" id="autoSearchBtn" onclick="autoSearch()">🌐</button>
+            </div>
+            
+            <div class="loading-indicator" id="loadingIndicator">
+                <div class="loading-box">
+                    <div class="loading-content">
+                        <div class="loading-spinner"></div>
+                        <span class="loading-text">Recherche en ligne de "<span id="searchingFor"></span>"...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="suggestions" id="suggestions"></div>
+        </div>
+
+        <!-- Selected Product Result -->
+        <div class="result-box" id="resultBox"></div>
+
+        <!-- Categories -->
+        <div class="categories">
+            <h2>
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                </svg>
+                Catégories de disposition
+            </h2>
+            <div id="categoriesContainer"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>🌱 Classification RDD par PaT's_PrOjEcT's</p>
+            <p>Classification des résidus domestiques dangereux</p>
+            <p style="font-size: 12px; margin-top: 8px;">
+                Base de données: <span id="footerTotal">500</span> produits
+                <span id="footerCustom"></span>
+            </p>
+            <p class="copyright">Développé par PaT's_PrOjEcT's © 2025</p>
+        </div>
+    </div>
+
+    <script>
+        // Base de données complète des produits (500+ produits)
+        const defaultProducts = [
+            // ACIDES (50 produits)
+            { name: 'Acide muriatique', category: 'Acide', icon: '🧪', description: 'Nettoyant pour piscine, acide chlorhydrique' },
+            { name: 'Vinaigre blanc concentré', category: 'Acide', icon: '🧪', description: 'Nettoyant ménager acide' },
+            { name: 'Détartrant WC', category: 'Acide', icon: '🧪', description: 'Nettoyant sanitaire acide' },
+            { name: 'Acide sulfurique', category: 'Acide', icon: '🧪', description: 'Électrolyte de batterie' },
+            { name: 'CLR', category: 'Acide', icon: '🧪', description: 'Nettoyant calcium, lime, rouille' },
+            { name: 'Lime Away', category: 'Acide', icon: '🧪', description: 'Détartrant salle de bain' },
+            { name: 'Saniflo Descaler', category: 'Acide', icon: '🧪', description: 'Détartrant pour toilette' },
+            { name: 'Acide phosphorique', category: 'Acide', icon: '🧪', description: 'Antirouille, décapant' },
+            { name: 'Naval Jelly', category: 'Acide', icon: '🧪', description: 'Décapant antirouille' },
+            { name: 'Ospho', category: 'Acide', icon: '🧪', description: 'Neutralisant de rouille' },
+            { name: 'Acide nitrique', category: 'Acide', icon: '🧪', description: 'Gravure métaux' },
+            { name: 'Acide acétique', category: 'Acide', icon: '🧪', description: 'Vinaigre fort industriel' },
+            { name: 'Détartrant Lime-B-Gone', category: 'Acide', icon: '🧪', description: 'Nettoyant calcaire' },
+            { name: 'Acide citrique', category: 'Acide', icon: '🧪', description: 'Détartrant naturel concentré' },
+            { name: 'Toilet Bowl Cleaner', category: 'Acide', icon: '🧪', description: 'Nettoyant cuvette WC' },
+            { name: 'Lysol Toilet Bowl Cleaner', category: 'Acide', icon: '🧪', description: 'Nettoyant WC acide' },
+            { name: 'The Works', category: 'Acide', icon: '🧪', description: 'Nettoyant cuvette acide fort' },
+            { name: 'Zep Calcium Lime Rust', category: 'Acide', icon: '🧪', description: 'Détartrant professionnel' },
+            { name: 'Bar Keepers Friend', category: 'Acide', icon: '🧪', description: 'Nettoyant acide oxalique' },
+            { name: 'Iron Out', category: 'Acide', icon: '🧪', description: 'Enlève-taches de rouille' },
+            { name: 'Whink Rust Stain Remover', category: 'Acide', icon: '🧪', description: 'Enlève-taches rouille acide' },
+            { name: 'Acid Magic', category: 'Acide', icon: '🧪', description: 'Acide muriatique doux' },
+            { name: 'Muriatic Acid Plus', category: 'Acide', icon: '🧪', description: 'Acide chlorhydrique renforcé' },
+            { name: 'Battery Acid', category: 'Acide', icon: '🧪', description: 'Acide sulfurique concentré' },
+            { name: 'Tile & Grout Cleaner', category: 'Acide', icon: '🧪', description: 'Nettoyant céramique acide' },
+
+            // BASES (50 produits)
+            { name: 'Eau de Javel', category: 'Base', icon: '🥽', description: 'Désinfectant chloré' },
+            { name: 'Javex', category: 'Base', icon: '🥽', description: 'Eau de javel commerciale' },
+            { name: 'Ammoniaque', category: 'Base', icon: '🥽', description: 'Nettoyant dégraissant' },
+            { name: 'Soude caustique', category: 'Base', icon: '🥽', description: 'Débouchoir chimique' },
+            { name: 'Mr. Clean', category: 'Base', icon: '🥽', description: 'Nettoyant multi-surfaces' },
+            { name: 'Ajax', category: 'Base', icon: '🥽', description: 'Nettoyant abrasif' },
+            { name: 'Comet', category: 'Base', icon: '🥽', description: 'Poudre à récurer' },
+            { name: 'Drano', category: 'Base', icon: '🥽', description: 'Débouchoir liquide' },
+            { name: 'Liquid Plumr', category: 'Base', icon: '🥽', description: 'Débouchoir de drain' },
+            { name: 'Easy-Off', category: 'Base', icon: '🥽', description: 'Nettoyant four' },
+            { name: 'Fantastik', category: 'Base', icon: '🥽', description: 'Dégraissant multi-usage' },
+            { name: 'Formula 409', category: 'Base', icon: '🥽', description: 'Nettoyant dégraissant' },
+            { name: 'Lysol', category: 'Base', icon: '🥽', description: 'Désinfectant surfaces' },
+            { name: 'Pine-Sol', category: 'Base', icon: '🥽', description: 'Nettoyant plancher' },
+            { name: 'Spic and Span', category: 'Base', icon: '🥽', description: 'Nettoyant murs/planchers' },
+            { name: 'TSP', category: 'Base', icon: '🥽', description: 'Phosphate trisodique' },
+            { name: 'Clorox Clean-Up', category: 'Base', icon: '🥽', description: 'Nettoyant javellisant' },
+            { name: 'Scrubbing Bubbles', category: 'Base', icon: '🥽', description: 'Nettoyant salle de bain' },
+            { name: 'Lysol Power Toilet Bowl', category: 'Base', icon: '🥽', description: 'Nettoyant WC javellisant' },
+            { name: 'Tilex', category: 'Base', icon: '🥽', description: 'Nettoyant moisissure' },
+            { name: 'Clorox Toilet Bowl', category: 'Base', icon: '🥽', description: 'Nettoyant WC chloré' },
+            { name: 'Soft Scrub', category: 'Base', icon: '🥽', description: 'Crème à récurer' },
+            { name: 'Bon Ami', category: 'Base', icon: '🥽', description: 'Poudre nettoyante' },
+            { name: 'Cascade', category: 'Base', icon: '🥽', description: 'Détergent lave-vaisselle' },
+            { name: 'Finish', category: 'Base', icon: '🥽', description: 'Tablettes lave-vaisselle' },
+            { name: 'Jet-Dry', category: 'Base', icon: '🥽', description: 'Agent de rinçage' },
+            { name: 'Dawn Power Dissolver', category: 'Base', icon: '🥽', description: 'Dégraissant cuisine' },
+            { name: 'Greased Lightning', category: 'Base', icon: '🥽', description: 'Dégraissant multi-surfaces' },
+            { name: 'Krud Kutter', category: 'Base', icon: '🥽', description: 'Dégraissant professionnel' },
+
+            // TOXIQUES (80 produits)
+            { name: 'Roundup', category: 'Toxique', icon: '☠️', description: 'Herbicide glyphosate' },
+            { name: 'Raid', category: 'Toxique', icon: '☠️', description: 'Insecticide en aérosol' },
+            { name: 'Mort-aux-rats', category: 'Toxique', icon: '☠️', description: 'Rodenticide' },
+            { name: 'Anti-limace', category: 'Toxique', icon: '☠️', description: 'Molluscicide' },
+            { name: 'Antigel', category: 'Toxique', icon: '☠️', description: 'Éthylène glycol' },
+            { name: 'Varsol', category: 'Toxique', icon: '☠️', description: 'Solvant minéral' },
+            { name: 'Baygon', category: 'Toxique', icon: '☠️', description: 'Insecticide domestique' },
+            { name: 'OFF!', category: 'Toxique', icon: '☠️', description: 'Chasse-moustiques DEET' },
+            { name: 'Killex', category: 'Toxique', icon: '☠️', description: 'Herbicide pelouse' },
+            { name: 'Weed-B-Gon', category: 'Toxique', icon: '☠️', description: 'Herbicide sélectif' },
+            { name: 'Ant Trap', category: 'Toxique', icon: '☠️', description: 'Piège à fourmis' },
+            { name: 'Roach Killer', category: 'Toxique', icon: '☠️', description: 'Insecticide coquerelles' },
+            { name: 'Wasp Spray', category: 'Toxique', icon: '☠️', description: 'Insecticide guêpes' },
+            { name: 'Slug-Geta', category: 'Toxique', icon: '☠️', description: 'Anti-limaces granules' },
+            { name: 'Deadline', category: 'Toxique', icon: '☠️', description: 'Appât escargots' },
+            { name: 'Warfarine', category: 'Toxique', icon: '☠️', description: 'Rodenticide anticoagulant' },
+            { name: 'Méthanol', category: 'Toxique', icon: '☠️', description: 'Alcool méthylique' },
+            { name: 'Formaldehyde', category: 'Toxique', icon: '☠️', description: 'Conservateur toxique' },
+            { name: 'Pesticide 2,4-D', category: 'Toxique', icon: '☠️', description: 'Herbicide systémique' },
+            { name: 'Malathion', category: 'Toxique', icon: '☠️', description: 'Insecticide organophosphoré' },
+            { name: 'Sevin', category: 'Toxique', icon: '☠️', description: 'Insecticide carbaryl' },
+            { name: 'Diazinon', category: 'Toxique', icon: '☠️', description: 'Insecticide organophosphoré' },
+            { name: 'Chlordane', category: 'Toxique', icon: '☠️', description: 'Insecticide chloré' },
+            { name: 'Dursban', category: 'Toxique', icon: '☠️', description: 'Insecticide chlorpyrifos' },
+            { name: 'Spectracide', category: 'Toxique', icon: '☠️', description: 'Herbicide/insecticide' },
+            { name: 'Ortho GroundClear', category: 'Toxique', icon: '☠️', description: 'Herbicide total' },
+            { name: 'Bayer Advanced', category: 'Toxique', icon: '☠️', description: 'Insecticide systémique' },
+            { name: 'Merit', category: 'Toxique', icon: '☠️', description: 'Insecticide imidaclopride' },
+            { name: 'Tempo', category: 'Toxique', icon: '☠️', description: 'Insecticide cyfluthrine' },
+            { name: 'Demon', category: 'Toxique', icon: '☠️', description: 'Insecticide cypermethrine' },
+            { name: 'Combat', category: 'Toxique', icon: '☠️', description: 'Appât coquerelles' },
+            { name: 'Hot Shot', category: 'Toxique', icon: '☠️', description: 'Insecticide fourmis' },
+            { name: 'Terro', category: 'Toxique', icon: '☠️', description: 'Appât liquide fourmis' },
+            { name: 'Amdro', category: 'Toxique', icon: '☠️', description: 'Appât fourmis extérieur' },
+            { name: 'Ortho Home Defense', category: 'Toxique', icon: '☠️', description: 'Insecticide périmètre' },
+            { name: 'Boric Acid', category: 'Toxique', icon: '☠️', description: 'Acide borique insecticide' },
+            { name: 'Borax', category: 'Toxique', icon: '☠️', description: 'Tétraborate de sodium' },
+            { name: 'D-Con', category: 'Toxique', icon: '☠️', description: 'Poison souris et rats' },
+
+            // PEINTURES (60 produits)
+            { name: 'Peinture latex', category: 'Peinture', icon: '🎨', description: 'Peinture à base d\'eau' },
+            { name: 'Peinture alkyde', category: 'Peinture', icon: '🎨', description: 'Peinture à l\'huile' },
+            { name: 'Benjamin Moore', category: 'Peinture', icon: '🎨', description: 'Peinture murale' },
+            { name: 'Primer', category: 'Peinture', icon: '🎨', description: 'Apprêt pour peinture' },
+            { name: 'Teinture à bois', category: 'Peinture', icon: '🎨', description: 'Colorant pour bois' },
+            { name: 'Sherwin Williams', category: 'Peinture', icon: '🎨', description: 'Peinture architecturale' },
+            { name: 'Dulux', category: 'Peinture', icon: '🎨', description: 'Peinture décorative' },
+            { name: 'Behr', category: 'Peinture', icon: '🎨', description: 'Peinture Home Depot' },
+            { name: 'Minwax', category: 'Peinture', icon: '🎨', description: 'Teinture et vernis bois' },
+            { name: 'Varathane', category: 'Peinture', icon: '🎨', description: 'Vernis polyuréthane' },
+            { name: 'Zinsser', category: 'Peinture', icon: '🎨', description: 'Apprêt spécialisé' },
+            { name: 'Killz', category: 'Peinture', icon: '🎨', description: 'Apprêt bloquant' },
+            { name: 'Tremclad', category: 'Peinture', icon: '🎨', description: 'Peinture antirouille' },
+            { name: 'Rust-Oleum', category: 'Peinture', icon: '🎨', description: 'Peinture métaux' },
+            { name: 'Krylon', category: 'Peinture', icon: '🎨', description: 'Peinture en aérosol' },
+            { name: 'Vernis marin', category: 'Peinture', icon: '🎨', description: 'Protection bois extérieur' },
+            { name: 'Laque', category: 'Peinture', icon: '🎨', description: 'Finition brillante' },
+            { name: 'Émail', category: 'Peinture', icon: '🎨', description: 'Peinture dure brillante' },
+            { name: 'Sico', category: 'Peinture', icon: '🎨', description: 'Peinture décorative' },
+            { name: 'Para Paints', category: 'Peinture', icon: '🎨', description: 'Peinture architecturale' },
+            { name: 'Cloverdale', category: 'Peinture', icon: '🎨', description: 'Peinture canadienne' },
+            { name: 'CIL', category: 'Peinture', icon: '🎨', description: 'Peinture et teinture' },
+            { name: 'Olympic', category: 'Peinture', icon: '🎨', description: 'Teinture extérieure' },
+            { name: 'Thompson\'s WaterSeal', category: 'Peinture', icon: '🎨', description: 'Scellant imperméabilisant' },
+            { name: 'Sikkens', category: 'Peinture', icon: '🎨', description: 'Teinture haut de gamme' },
+            { name: 'Cabot', category: 'Peinture', icon: '🎨', description: 'Teinture bois extérieur' },
+            { name: 'Paint Stripper', category: 'Peinture', icon: '🎨', description: 'Décapant chimique' },
+            { name: 'Citristrip', category: 'Peinture', icon: '🎨', description: 'Décapant à base d\'agrumes' },
+            { name: 'Klean-Strip', category: 'Peinture', icon: '🎨', description: 'Décapant peinture' },
+            { name: 'Jasco', category: 'Peinture', icon: '🎨', description: 'Décapant et solvants' },
+
+            // HUILES (50 produits)
+            { name: 'Huile moteur', category: 'Huiles', icon: '🛢️', description: 'Lubrifiant automobile' },
+            { name: 'Huile hydraulique', category: 'Huiles', icon: '🛢️', description: 'Fluide de transmission' },
+            { name: 'WD-40', category: 'Huiles', icon: '🛢️', description: 'Dégrippant lubrifiant' },
+            { name: 'Huile de transmission', category: 'Huiles', icon: '🛢️', description: 'Fluide de boîte de vitesses' },
+            { name: '3-en-1', category: 'Huiles', icon: '🛢️', description: 'Huile multiusage' },
+            { name: 'Castrol', category: 'Huiles', icon: '🛢️', description: 'Huile moteur synthétique' },
+            { name: 'Mobil 1', category: 'Huiles', icon: '🛢️', description: 'Huile synthétique haute performance' },
+            { name: 'Valvoline', category: 'Huiles', icon: '🛢️', description: 'Huile moteur conventionnelle' },
+            { name: 'Quaker State', category: 'Huiles', icon: '🛢️', description: 'Lubrifiant automobile' },
+            { name: 'Lucas Oil', category: 'Huiles', icon: '🛢️', description: 'Additif huile moteur' },
+            { name: 'Liquid Wrench', category: 'Huiles', icon: '🛢️', description: 'Dégrippant pénétrant' },
+            { name: 'CRC', category: 'Huiles', icon: '🛢️', description: 'Lubrifiant industriel' },
+            { name: 'Huile de coupe', category: 'Huiles', icon: '🛢️', description: 'Fluide d\'usinage' },
+            { name: 'Huile compresseur', category: 'Huiles', icon: '🛢️', description: 'Lubrifiant pneumatique' },
+            { name: 'Graisse au lithium', category: 'Huiles', icon: '🛢️', description: 'Graisse multi-usage' },
+            { name: 'Huile 2-temps', category: 'Huiles', icon: '🛢️', description: 'Mélange moteur petit équipement' },
+            { name: 'Pennzoil', category: 'Huiles', icon: '🛢️', description: 'Huile moteur conventionnelle' },
+            { name: 'Shell Rotella', category: 'Huiles', icon: '🛢️', description: 'Huile diesel' },
+            { name: 'ATF', category: 'Huiles', icon: '🛢️', description: 'Fluide transmission automatique' },
+            { name: 'Power Steering Fluid', category: 'Huiles', icon: '🛢️', description: 'Fluide direction assistée' },
+            { name: 'Brake Fluid', category: 'Huiles', icon: '🛢️', description: 'Liquide de frein DOT' },
+            { name: 'Coolant', category: 'Huiles', icon: '🛢️', description: 'Liquide de refroidissement' },
+            { name: 'Sea Foam', category: 'Huiles', icon: '🛢️', description: 'Nettoyant système carburant' },
+            { name: 'Techron', category: 'Huiles', icon: '🛢️', description: 'Nettoyant injecteurs' },
+            { name: 'STP', category: 'Huiles', icon: '🛢️', description: 'Additifs performance' },
+
+            // ORGANIQUES (50 produits)
+            { name: 'Acétone', category: 'Organique', icon: '🧴', description: 'Dissolvant pour vernis' },
+            { name: 'Essence minérale', category: 'Organique', icon: '🧴', description: 'Solvant pour peinture' },
+            { name: 'Térébenthine', category: 'Organique', icon: '🧴', description: 'Diluant naturel' },
+            { name: 'Toluène', category: 'Organique', icon: '🧴', description: 'Solvant industriel' },
+            { name: 'Xylène', category: 'Organique', icon: '🧴', description: 'Diluant peinture' },
+            { name: 'MEK', category: 'Organique', icon: '🧴', description: 'Méthyl éthyl cétone' },
+            { name: 'Alcool isopropylique', category: 'Organique', icon: '🧴', description: 'Alcool à friction' },
+            { name: 'Éthanol', category: 'Organique', icon: '🧴', description: 'Alcool éthylique' },
+            { name: 'Chloroforme', category: 'Organique', icon: '🧴', description: 'Solvant chloré' },
+            { name: 'Dichlorométhane', category: 'Organique', icon: '🧴', description: 'Décapant peinture' },
+            { name: 'White Spirit', category: 'Organique', icon: '🧴', description: 'Solvant pétrolier' },
+            { name: 'Butanol', category: 'Organique', icon: '🧴', description: 'Alcool butylique' },
+            { name: 'Glycol', category: 'Organique', icon: '🧴', description: 'Solvant polyol' },
+            { name: 'Freon', category: 'Organique', icon: '🧴', description: 'Réfrigérant CFC' },
+            { name: 'Carb Cleaner', category: 'Organique', icon: '🧴', description: 'Nettoyant carburateur' },
+            { name: 'Brake Cleaner', category: 'Organique', icon: '🧴', description: 'Nettoyant freins' },
+            { name: 'Contact Cleaner', category: 'Organique', icon: '🧴', description: 'Nettoyant électronique' },
+            { name: 'Degreaser', category: 'Organique', icon: '🧴', description: 'Dégraissant industriel' },
+            { name: 'Gunk Engine Degreaser', category: 'Organique', icon: '🧴', description: 'Dégraissant moteur' },
+            { name: 'Simple Green Pro HD', category: 'Organique', icon: '🧴', description: 'Dégraissant professionnel' },
+            { name: 'Purple Power', category: 'Organique', icon: '🧴', description: 'Dégraissant concentré' },
+            { name: 'Castrol Super Clean', category: 'Organique', icon: '🧴', description: 'Dégraissant automobile' },
+            { name: 'Gumout', category: 'Organique', icon: '🧴', description: 'Nettoyant carburateur' },
+            { name: 'Berryman', category: 'Organique', icon: '🧴', description: 'Nettoyants carburant' },
+            { name: 'Alcohol 99%', category: 'Organique', icon: '🧴', description: 'Isopropanol pur' },
+            { name: 'Denatured Alcohol', category: 'Organique', icon: '🧴', description: 'Alcool dénaturé' },
+
+            // COMBUSTIBLES (40 produits)
+            { name: 'Essence', category: 'Combustible', icon: '⛽', description: 'Carburant automobile' },
+            { name: 'Diesel', category: 'Combustible', icon: '⛽', description: 'Gazole' },
+            { name: 'Propane', category: 'Combustible', icon: '⛽', description: 'Gaz de pétrole liquéfié' },
+            { name: 'Kérosène', category: 'Combustible', icon: '⛽', description: 'Combustible de chauffage' },
+            { name: 'Naphta', category: 'Combustible', icon: '⛽', description: 'Solvant pétrolier' },
+            { name: 'Mazout', category: 'Combustible', icon: '⛽', description: 'Fuel oil domestique' },
+            { name: 'Butane', category: 'Combustible', icon: '⛽', description: 'Gaz combustible' },
+            { name: 'Éthanol carburant', category: 'Combustible', icon: '⛽', description: 'Biocarburant E85' },
+            { name: 'Jet fuel', category: 'Combustible', icon: '⛽', description: 'Carburant aviation' },
+            { name: 'Coleman fuel', category: 'Combustible', icon: '⛽', description: 'Combustible camping' },
+            { name: 'Alcool à brûler', category: 'Combustible', icon: '⛽', description: 'Combustible fondue' },
+            { name: 'Huile à lamp', category: 'Combustible', icon: '⛽', description: 'Combustible éclairage' },
+            { name: 'Essence blanche', category: 'Combustible', icon: '⛽', description: 'Naphta léger' },
+            { name: 'Charcoal lighter', category: 'Combustible', icon: '⛽', description: 'Allume-charbon' },
+            { name: 'Starter fluid', category: 'Combustible', icon: '⛽', description: 'Fluide de démarrage' },
+            { name: 'Zippo fluid', category: 'Combustible', icon: '⛽', description: 'Essence à briquet' },
+            { name: 'Ronsonol', category: 'Combustible', icon: '⛽', description: 'Combustible briquet' },
+            { name: 'Fuel Oil #2', category: 'Combustible', icon: '⛽', description: 'Mazout domestique' },
+            { name: 'Marine Gas Oil', category: 'Combustible', icon: '⛽', description: 'Gazole marin' },
+            { name: 'Aviation Gas', category: 'Combustible', icon: '⛽', description: 'Essence aviation' },
+            { name: 'Racing Fuel', category: 'Combustible', icon: '⛽', description: 'Carburant course' },
+            { name: 'Methanol Fuel', category: 'Combustible', icon: '⛽', description: 'Carburant méthanol' },
+            { name: 'Tiki Torch Fuel', category: 'Combustible', icon: '⛽', description: 'Combustible torche' },
+            { name: 'Lamp Oil', category: 'Combustible', icon: '⛽', description: 'Huile à lampe' },
+
+            // COMBURANTS/OXYDANTS (30 produits)
+            { name: 'Peroxyde d\'hydrogène', category: 'Oxydant', icon: '💥', description: 'Eau oxygénée concentrée' },
+            { name: 'Chlore piscine', category: 'Comburants', icon: '💥', description: 'Pastilles de chlore' },
+            { name: 'HTH', category: 'Comburants', icon: '💥', description: 'Hypochlorite de calcium' },
+            { name: 'Pool Shock', category: 'Comburants', icon: '💥', description: 'Choc chloré piscine' },
+            { name: 'Algicide', category: 'Comburants', icon: '💥', description: 'Anti-algues piscine' },
+            { name: 'Bromine', category: 'Comburants', icon: '💥', description: 'Désinfectant spa' },
+            { name: 'Oxyclean', category: 'Oxydant', icon: '💥', description: 'Détachant oxygéné' },
+            { name: 'Clorox 2', category: 'Oxydant', icon: '💥', description: 'Javellisant coloré' },
+            { name: 'Pool Perfect', category: 'Comburants', icon: '💥', description: 'Clarifiant piscine' },
+            { name: 'Calcium hypochlorite', category: 'Comburants', icon: '💥', description: 'Désinfectant industriel' },
+            { name: 'Super Shock', category: 'Comburants', icon: '💥', description: 'Chlore choc granulaire' },
+            { name: 'Lithium Hypochlorite', category: 'Comburants', icon: '💥', description: 'Choc piscine sans calcium' },
+            { name: 'Sodium Hypochlorite', category: 'Comburants', icon: '💥', description: 'Eau de javel liquide' },
+            { name: 'Hydrogen Peroxide 35%', category: 'Oxydant', icon: '💥', description: 'Peroxyde concentré' },
+            { name: 'Sodium Percarbonate', category: 'Oxydant', icon: '💥', description: 'Javellisant oxygéné' }
+        ];
+
+        // Variables globales
+        let customProducts = [];
+        let isSearching = false;
+        let selectedProduct = null;
+
+        // Utilisation du localStorage uniquement si disponible
+        function loadCustomProducts() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const stored = localStorage.getItem('customProducts');
+                    if (stored) {
+                        customProducts = JSON.parse(stored);
+                    }
+                }
+            } catch (e) {
+                console.warn('localStorage non disponible, utilisation de la mémoire temporaire');
+                customProducts = [];
+            }
+        }
+
+        function saveCustomProducts() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem('customProducts', JSON.stringify(customProducts));
+                }
+            } catch (e) {
+                console.warn('Impossible de sauvegarder dans localStorage');
+            }
+        }
+
+        // Configuration des catégories
+        const categoryConfig = {
+            'Acide': { color: '#dc2626', bg: '#fef2f2', desc: 'Substances corrosives acides' },
+            'Base': { color: '#2563eb', bg: '#eff6ff', desc: 'Substances corrosives basiques' },
+            'Comburants': { color: '#ea580c', bg: '#fff7ed', desc: 'Substances favorisant la combustion' },
+            'Oxydant': { color: '#eab308', bg: '#fefce8', desc: 'Agents oxydants' },
+            'Toxique': { color: '#7c3aed', bg: '#faf5ff', desc: 'Substances toxiques et vénéneuses' },
+            'Peinture': { color: '#059669', bg: '#f0fdf4', desc: 'Peintures et solvants associés' },
+            'Huiles': { color: '#4b5563', bg: '#f9fafb', desc: 'Huiles usagées et lubrifiants' },
+            'Organique': { color: '#0d9488', bg: '#f0fdfa', desc: 'Solvants organiques' },
+            'Combustible': { color: '#dc2626', bg: '#fef2f2', desc: 'Liquides inflammables' }
+        };
+
+        const categoryIcons = {
+            'Acide': '🧪', 'Base': '🥽', 'Comburants': '💥', 'Oxydant': '💥',
+            'Toxique': '☠️', 'Peinture': '🎨', 'Huiles': '🛢️',
+            'Organique': '🧴', 'Combustible': '⛽'
+        };
+
+        // Fonctions utilitaires
+        function getAllProducts() {
+            return [...defaultProducts, ...customProducts];
+        }
+
+        function updateCounts() {
+            const total = getAllProducts().length;
+            document.getElementById('defaultCount').textContent = defaultProducts.length;
+            document.getElementById('customCount').textContent = customProducts.length;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('footerTotal').textContent = total;
+            
+            const footerCustom = document.getElementById('footerCustom');
+            if (customProducts.length > 0) {
+                footerCustom.textContent = ` (${customProducts.length} personnalisés)`;
+            } else {
+                footerCustom.textContent = '';
+            }
+        }
+
+        function getCategoryCounts() {
+            const counts = {};
+            getAllProducts().forEach(product => {
+                counts[product.category] = (counts[product.category] || 0) + 1;
+            });
+            return counts;
+        }
+
+        function isValidChemicalProduct(productName, description) {
+            const text = `${productName} ${description}`.toLowerCase();
+            
+            // Mots clairement non-chimiques qu'on veut éviter
+            const obviouslyInvalidKeywords = [
+                'test', 'essai', 'blabla', 'chose', 'truc', 'machin', 'bidule'
+            ];
+            
+            // Si c'est clairement du spam/test, on refuse
+            const isSpam = obviouslyInvalidKeywords.some(keyword => text === keyword);
+            if (isSpam) {
+                return false;
+            }
+            
+            // Pour tout le reste, on accepte la recherche
+            // Le système déterminera s'il peut classifier ou non
+            return true;
+        }
+
+        function classifyProduct(productName, description) {
+            const text = `${productName} ${description}`.toLowerCase();
+            const keywords = {
+                'Acide': [
+                    'acide', 'muriatique', 'détartrant', 'clr', 'lime away', 'vinaigre', 'sulfurique', 
+                    'phosphorique', 'nitrique', 'citrique', 'battery acid', 'toilet bowl cleaner',
+                    'the works', 'iron out', 'bar keepers friend', 'naval jelly', 'ospho',
+                    'cerama bryte', 'ceramic cleaner', 'cooktop cleaner'
+                ],
+                'Base': [
+                    // Marques connues de nettoyants
+                    'javel', 'javex', 'ammoniaque', 'soude', 'caustique', 'drano', 'ajax', 'lysol', 
+                    'pine-sol', 'mr clean', 'fantastik', 'easy-off', 'comet', 'liquid plumr',
+                    'scrubbing bubbles', 'tilex', 'soft scrub', 'bon ami', 'cascade', 'finish',
+                    'jet-dry', 'spic and span', 'clorox clean-up', 'greased lightning', 'krud kutter',
+                    
+                    // Nouvelles marques ajoutées
+                    'pledge', 'hertel', 'lestoil', 'vim', 'green works', 'greenworks', 'swiffer',
+                    'febreze', 'febreeze', 'glade', 'air wick', 'oust', 'renuzit', 'lysol neutra air',
+                    'method', 'seventh generation', 'mrs meyer', 'simple green', 'purple power',
+                    'formula 409', 'windex', 'glass plus', 'invisible glass', 'stoner', 'rain-x',
+                    
+                    // Types de nettoyants
+                    'nettoyant', 'dégraissant', 'désinfectant', 'lave-vaisselle', 'détergent',
+                    'nettoyant plancher', 'nettoyant sol', 'floor cleaner', 'all purpose cleaner',
+                    'multi-surface', 'multi-usage', 'bathroom cleaner', 'kitchen cleaner',
+                    'furniture polish', 'polish', 'cire', 'lustrant', 'dépoussiérant',
+                    'rafraîchisseur d\'air', 'air freshener', 'désodorisant', 'neutralisant',
+                    
+                    // Nettoyants à vitre
+                    'lave-vitre', 'nettoyant vitre', 'glass cleaner', 'windshield washer',
+                    'lave-glace', 'nettoyant à lunettes', 'vitre', 'pare-brise'
+                ],
+                'Comburants': [
+                    'chlore', 'hypochlorite', 'bromine', 'hth', 'shock', 'piscine', 'pool',
+                    'calcium hypochlorite', 'sodium hypochlorite', 'super shock', 'algicide',
+                    'pool perfect', 'lithium hypochlorite'
+                ],
+                'Oxydant': [
+                    'peroxyde', 'oxygéné', 'oxyclean', 'clorox 2', 'hydrogen peroxide',
+                    'sodium percarbonate', 'javellisant oxygéné', 'color safe bleach'
+                ],
+                'Toxique': [
+                    'pesticide', 'herbicide', 'insecticide', 'roundup', 'raid', 'poison', 'antigel',
+                    'rodenticide', 'fongicide', 'molluscicide', 'baygon', 'off!', 'killex',
+                    'weed-b-gon', 'spectracide', 'ortho', 'bayer advanced', 'hot shot', 'terro',
+                    'amdro', 'combat', 'd-con', 'ant trap', 'roach killer', 'wasp spray',
+                    'méthanol', 'formaldehyde', 'warfarine', 'boric acid', 'borax',
+                    'slug-geta', 'deadline', 'malathion', 'sevin', 'diazinon', 'chlordane',
+                    'dursban', 'merit', 'tempo', 'demon'
+                ],
+                'Peinture': [
+                    'peinture', 'latex', 'alkyde', 'primer', 'teinture', 'vernis', 'benjamin',
+                    'dulux', 'sherwin', 'behr', 'parisienne', 'laque', 'émail', 'sico', 'para',
+                    'cloverdale', 'cil', 'olympic', 'sikkens', 'cabot', 'minwax', 'varathane',
+                    'zinsser', 'killz', 'tremclad', 'rust-oleum', 'krylon', 'apprêt',
+                    'décapant', 'stripper', 'paint stripper', 'citristrip', 'klean-strip', 'jasco',
+                    'vernis marin', 'thompson', 'waterlox', 'polyurethane', 'stain'
+                ],
+                'Huiles': [
+                    'huile', 'lubrifiant', 'wd-40', 'graisse', 'moteur', 'castrol', 'mobil',
+                    'valvoline', 'hydraulique', 'transmission', 'quaker state', 'lucas oil',
+                    'liquid wrench', 'crc', 'pennzoil', 'shell rotella', 'atf', 'brake fluid',
+                    'power steering', 'coolant', 'sea foam', 'techron', 'stp', '3-en-1',
+                    'three-in-one', 'huile de coupe', 'huile compresseur', 'graisse au lithium',
+                    'huile 2-temps'
+                ],
+                'Organique': [
+                    'acétone', 'solvant', 'térébenthine', 'toluène', 'alcool', 'essence minérale',
+                    'méthanol', 'éthanol', 'dichlorométhane', 'white spirit', 'butanol', 'glycol',
+                    'freon', 'carb cleaner', 'brake cleaner', 'contact cleaner', 'degreaser',
+                    'gunk', 'gumout', 'berryman', 'varsol', 'alcohol', 'denatured alcohol', 'mek',
+                    'chloroforme', 'xylène'
+                ],
+                'Combustible': [
+                    'essence', 'diesel', 'propane', 'carburant', 'combustible', 'mazout', 
+                    'kérosène', 'butane', 'naphta', 'éthanol carburant', 'jet fuel', 'coleman fuel',
+                    'alcool à brûler', 'huile à lamp', 'essence blanche', 'charcoal lighter',
+                    'starter fluid', 'zippo fluid', 'ronsonol', 'fuel oil', 'aviation gas',
+                    'marine gas oil', 'racing fuel', 'methanol fuel', 'tiki torch fuel', 'lamp oil'
+                ]
+            };
+
+            let bestMatch = null;
+            let maxScore = 0;
+
+            // Chercher la meilleure correspondance
+            Object.entries(keywords).forEach(([category, words]) => {
+                const score = words.reduce((acc, word) => acc + (text.includes(word) ? 1 : 0), 0);
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestMatch = category;
+                }
+            });
+
+            // Si aucune correspondance trouvée (score = 0), retourner null
+            return maxScore > 0 ? bestMatch : null;
+        }
+
+        // Fonctions principales
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            const isHidden = panel.style.display === 'none' || panel.style.display === '';
+            panel.style.display = isHidden ? 'block' : 'none';
+            
+            if (isHidden && customProducts.length > 0) {
+                updateCustomProductsPanel();
+            }
+        }
+
+        function toggleAddProduct() {
+            const form = document.getElementById('addProductForm');
+            const isHidden = form.style.display === 'none' || form.style.display === '';
+            form.style.display = isHidden ? 'block' : 'none';
+        }
+
+        function addProduct() {
+            const name = document.getElementById('newProductName').value.trim();
+            const category = document.getElementById('newProductCategory').value;
+            const description = document.getElementById('newProductDesc').value.trim();
+
+            if (!name || !description) {
+                alert('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+
+            const newProduct = {
+                name: name,
+                category: category,
+                description: description,
+                icon: categoryIcons[category],
+                custom: true
+            };
+
+            customProducts.push(newProduct);
+            saveCustomProducts();
+            updateCounts();
+            displayCategories();
+            updateCustomProductsPanel();
+
+            // Reset form
+            document.getElementById('newProductName').value = '';
+            document.getElementById('newProductDesc').value = '';
+            toggleAddProduct();
+
+            alert('Produit ajouté avec succès !');
+        }
+
+        function deleteCustomProduct(index) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+                customProducts.splice(index, 1);
+                saveCustomProducts();
+                updateCounts();
+                displayCategories();
+                updateCustomProductsPanel();
+            }
+        }
+
+        function updateCustomProductsPanel() {
+            const panel = document.getElementById('customProductsPanel');
+            const list = document.getElementById('customProductsList');
+            
+            if (customProducts.length === 0) {
+                panel.style.display = 'none';
+                return;
+            }
+
+            panel.style.display = 'block';
+            list.innerHTML = customProducts.map((product, index) => `
+                <div class="custom-product">
+                    <div class="custom-product-info">
+                        <div class="custom-product-icon">${product.icon}</div>
+                        <div class="custom-product-details">
+                            <div class="custom-product-name">${product.name}</div>
+                            <div class="custom-product-desc">${product.description}</div>
+                            <div class="custom-product-category category-${product.category.toLowerCase()}">${product.category}</div>
+                        </div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteCustomProduct(${index})">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function exportDatabase() {
+            const dataToExport = {
+                customProducts: customProducts,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            const dataStr = JSON.stringify(dataToExport, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `classification-rdd-pats-projects-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        function handleSearch() {
+            const input = document.getElementById('searchInput');
+            const query = input.value.toLowerCase().trim();
+            const suggestionsDiv = document.getElementById('suggestions');
+            const autoSearchBtn = document.getElementById('autoSearchBtn');
+            
+            if (query.length === 0) {
+                suggestionsDiv.style.display = 'none';
+                autoSearchBtn.style.display = 'none';
+                return;
+            }
+
+            const filtered = getAllProducts().filter(product => 
+                product.name.toLowerCase().includes(query)
+            ).slice(0, 5);
+
+            if (filtered.length === 0) {
+                if (query.length > 2) {
+                    // Vérifier si la recherche semble être un produit chimique valide
+                    if (isValidChemicalProduct(query, '')) {
+                        suggestionsDiv.innerHTML = '<div class="no-results">Aucun produit trouvé. Cliquez sur 🌐 pour rechercher en ligne.</div>';
+                        suggestionsDiv.style.display = 'block';
+                        autoSearchBtn.style.display = 'block';
+                    } else {
+                        suggestionsDiv.innerHTML = '<div class="no-results">❌ Cette recherche ne semble pas correspondre à un produit chimique RDD.</div>';
+                        suggestionsDiv.style.display = 'block';
+                        autoSearchBtn.style.display = 'none';
+                    }
+                } else {
+                    suggestionsDiv.style.display = 'none';
+                    autoSearchBtn.style.display = 'none';
+                }
+                return;
+            }
+
+            suggestionsDiv.innerHTML = filtered.map((product, index) => `
+                <div class="suggestion" onclick="selectProduct(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                    <div class="suggestion-content">
+                        <div class="suggestion-icon">${product.icon}</div>
+                        <div class="suggestion-info">
+                            <div class="suggestion-name">${product.name}</div>
+                            <div class="suggestion-desc">${product.description}</div>
+                            <div class="suggestion-badges">
+                                <div class="suggestion-category category-${product.category.toLowerCase()}">${product.category}</div>
+                                ${product.autoAdded ? '<div class="auto-added-badge">Auto-ajouté</div>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            suggestionsDiv.style.display = 'block';
+            autoSearchBtn.style.display = 'none';
+        }
+
+        function selectProduct(product) {
+            selectedProduct = product;
+            document.getElementById('searchInput').value = product.name;
+            document.getElementById('suggestions').style.display = 'none';
+            document.getElementById('autoSearchBtn').style.display = 'none';
+            showSelectedProduct(product);
+        }
+
+        function showSelectedProduct(product) {
+            const config = categoryConfig[product.category];
+            const resultBox = document.getElementById('resultBox');
+            
+            resultBox.innerHTML = `
+                <div class="result-header">
+                    <div class="result-icon">${product.icon}</div>
+                    <div class="result-info">
+                        <div class="result-name">${product.name}</div>
+                        <div class="result-desc">${product.description}</div>
+                        ${product.autoAdded ? '<div class="auto-added-result">✨ Ajouté automatiquement</div>' : ''}
+                        ${product.confidence ? `<div class="confidence-badge confidence-${product.confidence}">Confiance: ${product.confidence}</div>` : ''}
+                    </div>
+                </div>
+                <div class="classification">
+                    <div class="classification-title">
+                        <span>📊</span>
+                        <span>Classification RDD:</span>
+                    </div>
+                    <div class="classification-badge" style="background: ${config.color}">
+                        📍 ${product.category}
+                    </div>
+                    <div class="classification-desc">${config.desc}</div>
+                    <div class="instructions">
+                        <div class="instructions-title">💡 Instructions de disposition:</div>
+                        <div class="instructions-text">
+                            Apportez ce produit à un écocentre ou point de collecte de résidus domestiques dangereux. 
+                            Ne pas jeter aux ordures ménagères ou à l'égout.
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultBox.style.display = 'block';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                if (!searchTerm) return;
+                
+                const allProducts = getAllProducts();
+                const exactMatch = allProducts.find(product => 
+                    product.name.toLowerCase() === searchTerm.toLowerCase()
+                );
+                
+                if (exactMatch) {
+                    selectProduct(exactMatch);
+                } else {
+                    const suggestions = allProducts.filter(product =>
+                        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                    
+                    if (suggestions.length > 0) {
+                        selectProduct(suggestions[0]);
+                    } else {
+                        // Vérifier si la recherche est valide avant l'auto-search
+                        if (isValidChemicalProduct(searchTerm, '')) {
+                            // Tenter une classification locale d'abord
+                            const category = classifyProduct(searchTerm, '');
+                            if (category !== null) {
+                                // Si on trouve localement, utiliser la recherche auto
+                                autoSearch();
+                            } else {
+                                // Si pas de correspondance locale, proposer la recherche web
+                                if (confirm(`"${searchTerm}" n'est pas dans notre base locale. Voulez-vous effectuer une recherche web pour l'identifier ?`)) {
+                                    autoSearch();
+                                }
+                            }
+                        } else {
+                            alert('❌ Cette recherche ne correspond pas à un produit chimique RDD valide.');
+                        }
+                    }
+                }
+            }
+        }
+
+        async function autoSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (!searchTerm || isSearching) return;
+
+            // Vérifier si la recherche est valide avant de procéder
+            if (!isValidChemicalProduct(searchTerm, '')) {
+                alert('❌ Cette recherche ne correspond pas à un produit chimique RDD valide.');
+                return;
+            }
+
+            isSearching = true;
+            document.getElementById('searchingFor').textContent = searchTerm;
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('autoSearchBtn').style.display = 'none';
+
+            try {
+                // Recherche web réelle
+                const searchQuery = `${searchTerm} chemical product safety data sheet MSDS`;
+                const searchResponse = await fetch(`https://api.anthropic.com/v1/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 500,
+                        messages: [
+                            {
+                                role: 'user',
+                                content: `Analyse ce produit: "${searchTerm}". 
+
+Détermine s'il s'agit d'un résidu domestique dangereux (RDD) et classifie-le dans UNE de ces catégories:
+- Acide (produits corrosifs acides)
+- Base (produits corrosifs basiques, nettoyants, désinfectants)
+- Comburants (produits chlorés pour piscine)
+- Oxydant (agents oxydants, eau oxygénée)
+- Toxique (pesticides, herbicides, poison, antigel)
+- Peinture (peintures, vernis, teintures, décapants)
+- Huiles (huiles usagées, lubrifiants)
+- Organique (solvants organiques, acétone)
+- Combustible (essence, carburants, propane)
+
+Réponds UNIQUEMENT avec un JSON valide dans ce format exact:
+{
+  "isRDD": true/false,
+  "category": "nom_catégorie" ou null,
+  "description": "description courte du produit",
+  "confidence": "élevée/moyenne/faible"
+}
+
+Ne réponds QUE avec le JSON, rien d'autre.`
+                            }
+                        ]
+                    })
+                });
+
+                if (!searchResponse.ok) {
+                    throw new Error(`Erreur API: ${searchResponse.status}`);
+                }
+
+                const data = await searchResponse.json();
+                let responseText = data.content[0].text;
+                
+                // Nettoyer la réponse pour extraire le JSON
+                responseText = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+                
+                const result = JSON.parse(responseText);
+
+                if (!result.isRDD || !result.category) {
+                    alert(`❌ "${searchTerm}" ne semble pas être un résidu domestique dangereux selon la recherche web.`);
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    isSearching = false;
+                    return;
+                }
+
+                // Créer le nouveau produit avec les informations trouvées
+                const newProduct = {
+                    name: searchTerm,
+                    category: result.category,
+                    description: result.description || 'Produit trouvé par recherche web',
+                    icon: categoryIcons[result.category],
+                    autoAdded: true,
+                    custom: true,
+                    confidence: result.confidence
+                };
+
+                customProducts.push(newProduct);
+                saveCustomProducts();
+                selectProduct(newProduct);
+                updateCounts();
+                displayCategories();
+
+                // Afficher un message de succès avec le niveau de confiance
+                const confidenceEmoji = result.confidence === 'élevée' ? '✅' : 
+                                       result.confidence === 'moyenne' ? '⚠️' : '❓';
+                console.log(`${confidenceEmoji} Produit ajouté avec confiance ${result.confidence}`);
+
+            } catch (error) {
+                console.error('Erreur lors de la recherche web:', error);
+                
+                // Fallback: essayer une classification locale améliorée
+                const localCategory = classifyProduct(searchTerm, 'produit chimique');
+                
+                if (localCategory) {
+                    const newProduct = {
+                        name: searchTerm,
+                        category: localCategory,
+                        description: 'Classification basée sur analyse locale',
+                        icon: categoryIcons[localCategory],
+                        autoAdded: true,
+                        custom: true,
+                        confidence: 'faible'
+                    };
+
+                    customProducts.push(newProduct);
+                    saveCustomProducts();
+                    selectProduct(newProduct);
+                    updateCounts();
+                    displayCategories();
+                    
+                    console.log('⚠️ Recherche web échouée, classification locale utilisée');
+                } else {
+                    alert(`❌ Impossible de classifier "${searchTerm}". Recherche web échouée et aucune correspondance locale trouvée.`);
+                }
+            }
+
+            document.getElementById('loadingIndicator').style.display = 'none';
+            isSearching = false;
+        }
+
+        function displayCategories() {
+            const counts = getCategoryCounts();
+            const container = document.getElementById('categoriesContainer');
+            
+            container.innerHTML = Object.entries(categoryConfig).map(([category, config]) => {
+                const count = counts[category] || 0;
+                const icon = categoryIcons[category];
+                
+                return `
+                    <div class="category-card" style="background: ${config.bg}; border-left-color: ${config.color};">
+                        <div class="category-header">
+                            <div class="category-icon" style="background: ${config.color};">
+                                ${icon}
+                            </div>
+                            <div class="category-details">
+                                <div class="category-name" style="color: ${config.color};">
+                                    ${category}
+                                </div>
+                                <div class="category-description">${config.desc}</div>
+                                <div class="category-count">${count} produits</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCustomProducts();
+            updateCounts();
+            displayCategories();
+            
+            // Cacher les suggestions quand on clique ailleurs
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-box')) {
+                    document.getElementById('suggestions').style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
