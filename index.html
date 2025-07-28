@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classification RDD par PaT's_PrOjEcT's</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .header .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+        
+        .header .description {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .admin-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .admin-panel {
+            background: #f3f4f6;
+            border-bottom: 2px solid #d1d5db;
+            padding: 15px;
+            display: none;
+        }
+        
+        .admin-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .admin-buttons {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .admin-btn-full {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .btn-blue {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-blue:hover {
+            background: #2563eb;
+        }
+        
+        .btn-green {
+            background: #059669;
+            color: white;
+        }
+        
+        .btn-green:hover {
+            background: #047857;
+        }
+        
+        .btn-gray {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-gray:hover {
+            background: #4b5563;
+        }
+        
+        .stats-box {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .stats-title {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .add-product-form {
+            background: #eff6ff;
+            border-bottom: 2px solid #93c5fd;
+            padding: 15px;
+            display: none;
+        }
+        
+        .form-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .search-box {
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .auto-search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+            display: none;
+        }
+        
+        .auto-search-btn:hover {
+            background: #2563eb;
+        }
+        
+        .loading-indicator {
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+        }
+        
+        .loading-box {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 6px;
+            padding: 12px;
+        }
+        
+        .loading-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #3b82f6;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #1d4ed8;
+            font-size: 14px;
+        }
+        
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-top: 5px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 10;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .suggestion {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s;
+        }
+        
+        .suggestion:hover {
+            background: #f9fafb;
+        }
+        
+        .suggestion:last-child {
+            border-bottom: none;
+        }
+        
+        .suggestion-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .suggestion-icon {
+            font-size: 20px;
+        }
+        
+        .suggestion-info {
+            flex: 1;
+        }
+        
+        .suggestion-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .suggestion-desc {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+        
+        .suggestion-badges {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        .suggestion-category {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 7px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .auto-added-badge {
+            font-size: 10px;
+            background: #dcfce7;
+            color: #166534;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+        
+        .category-acide { background: #dc2626; }
+        .category-base { background: #2563eb; }
+        .category-toxique { background: #7c3aed; }
+        .category-peinture { background: #059669; }
+        .category-huiles { background: #4b5563; }
+        .category-organique { background: #0d9488; }
+        .category-combustible { background: #dc2626; }
+        .category-comburants { background: #ea580c; }
+        .category-oxydant { background: #eab308; }
+        
+        .result-box {
+            margin: 15px;
+            padding: 15px;
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .result-icon {
+            font-size: 32px;
+        }
+        
+        .result-info {
+            flex: 1;
+        }
+        
+        .result-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .result-desc {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .auto-added-result {
+            background: #dcfce7;
+            color: #166534;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .confidence-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .confidence-élevée {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .confidence-moyenne {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .confidence-faible {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .classification {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #059669;
+        }
+        
+        .classification-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .classification-badge {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .classification-desc {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions {
+            background: #fefce8;
+            border: 1px solid #fde047;
+            padding: 12px;
+            border-radius: 6px;
+        }
+        
+        .instructions-title {
+            font-weight: bold;
+            color: #a16207;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .instructions-text {
+            font-size: 12px;
+            color: #a16207;
+        }
+        
+        .categories {
+            padding: 15px;
+        }
+        
+        .categories h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        
+        .category-card:hover {
+            transform: translateX(3px);
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .category-icon {
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .category-details {
+            flex: 1;
+        }
+        
+        .category-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .category-description {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 2px;
+        }
+        
+        .category-count {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        .footer {
+            background: #f3f4f6;
+            padding: 15px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .footer p {
+            margin-bottom: 5px;
+        }
+        
+        .footer .copyright {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 8px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Classification RDD</h1>
+            <p class="subtitle">par PaT's_PrOjEcT's</p>
+            <p class="description">Résidus domestiques dangereux</p>
+            <button class="admin-btn" id="adminBtn">⚙️ Admin</button>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-title">⚙️ Panneau d'administration</div>
+            <div class="admin-buttons">
+                <button class="admin-btn-full btn-blue" id="addProductBtn">➕ Ajouter un produit</button>
+                <button class="admin-btn-full btn-green" id="exportBtn">📤 Exporter ma base de données</button>
+                <div class="stats-box">
+                    <div class="stats-title">Classification RDD - PaT's_PrOjEcT's</div>
+                    <div>• Produits par défaut: <span id="defaultCount">45</span></div>
+                    <div>• Produits personnalisés: <span id="customCount">0</span></div>
+                    <div>• Total: <span id="totalCount">45</span></div>
+                    <div style="margin-top: 8px; font-size: 12px; color: #059669;">
+                        🌐 Recherche intelligente activée
+                    </div>
+                    <div class="copyright">© 2025 PaT's_PrOjEcT's</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Product Form -->
+        <div class="add-product-form" id="addProductForm">
+            <h3 class="form-title">➕ Ajouter un nouveau produit</h3>
+            <div class="form-group">
+                <label class="form-label">Nom du produit *</label>
+                <input type="text" class="form-input" id="newProductName" placeholder="Ex: WD-40, Roundup, etc.">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Catégorie RDD *</label>
+                <select class="form-select" id="newProductCategory">
+                    <option value="Acide">🧪 Acide</option>
+                    <option value="Base">🥽 Base</option>
+                    <option value="Comburants">💥 Comburants</option>
+                    <option value="Oxydant">💥 Oxydant</option>
+                    <option value="Toxique">☠️ Toxique</option>
+                    <option value="Peinture">🎨 Peinture</option>
+                    <option value="Huiles">🛢️ Huiles</option>
+                    <option value="Organique">🧴 Organique</option>
+                    <option value="Combustible">⛽ Combustible</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description *</label>
+                <input type="text" class="form-input" id="newProductDesc" placeholder="Ex: Dégrippant lubrifiant, Herbicide glyphosate, etc.">
+            </div>
+            <div class="form-buttons">
+                <button class="admin-btn-full btn-green" id="addProductSubmit" style="flex: 1;">✅ Ajouter</button>
+                <button class="admin-btn-full btn-gray" id="addProductCancel" style="flex: 1;">❌ Annuler</button>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-box">
+            <div class="search-container">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" class="search-input" id="searchInput" 
+                       placeholder="Rechercher un produit (ex: WD-40, Roundup...)" >
+                <button class="auto-search-btn" id="autoSearchBtn">🌐</button>
+            </div>
+            
+            <div class="loading-indicator" id="loadingIndicator">
+                <div class="loading-box">
+                    <div class="loading-content">
+                        <div class="loading-spinner"></div>
+                        <span class="loading-text">Recherche intelligente de "<span id="searchingFor"></span>"...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="suggestions" id="suggestions"></div>
+        </div>
+
+        <!-- Selected Product Result -->
+        <div class="result-box" id="resultBox"></div>
+
+        <!-- Categories -->
+        <div class="categories">
+            <h2>
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                </svg>
+                Catégories de disposition
+            </h2>
+            <div id="categoriesContainer"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>🌱 Classification RDD par PaT's_PrOjEcT's</p>
+            <p>Classification des résidus domestiques dangereux</p>
+            <p style="font-size: 12px; margin-top: 8px;">
+                Base de données: <span id="footerTotal">45</span> produits
+                <span id="footerCustom"></span>
+            </p>
+            <p class="copyright">Développé par PaT's_PrOjEcT's © 2025</p>
+        </div>
+    </div>
+
+    <script>
+        "use strict";
+        
+        // Variables globales
+        let customProducts = [];
+        let isSearching = false;
+        let selectedProduct = null;
+
+        // Configuration des catégories
+        const categoryConfig = {
+            'Acide': { color: '#dc2626', bg: '#fef2f2', desc: 'Substances corrosives acides' },
+            'Base': { color: '#2563eb', bg: '#eff6ff', desc: 'Substances corrosives basiques' },
+            'Comburants': { color: '#ea580c', bg: '#fff7ed', desc: 'Substances favorisant la combustion' },
+            'Oxydant': { color: '#eab308', bg: '#fefce8', desc: 'Agents oxydants' },
+            'Toxique': { color: '#7c3aed', bg: '#faf5ff', desc: 'Substances toxiques et vénéneuses' },
+            'Peinture': { color: '#059669', bg: '#f0fdf4', desc: 'Peintures et solvants associés' },
+            'Huiles': { color: '#4b5563', bg: '#f9fafb', desc: 'Huiles usagées et lubrifiants' },
+            'Organique': { color: '#0d9488', bg: '#f0fdfa', desc: 'Solvants organiques' },
+            'Combustible': { color: '#dc2626', bg: '#fef2f2', desc: 'Liquides inflammables' }
+        };
+
+        const categoryIcons = {
+            'Acide': '🧪',
+            'Base': '🥽', 
+            'Comburants': '💥', 
+            'Oxydant': '💥',
+            'Toxique': '☠️', 
+            'Peinture': '🎨', 
+            'Huiles': '🛢️',
+            'Organique': '🧴', 
+            'Combustible': '⛽'
+        };
+
+        // Base de données des produits par défaut
+        const defaultProducts = [
+            { name: 'Acide muriatique', category: 'Acide', icon: '🧪', description: 'Nettoyant pour piscine, acide chlorhydrique' },
+            { name: 'The Ordinary Solution Tonique', category: 'Acide', icon: '🧪', description: 'Solution tonique acide pour visage' },
+            { name: 'Paula\'s Choice BHA', category: 'Acide', icon: '🧪', description: 'Exfoliant acide salicylique 2%' },
+            { name: 'CLR', category: 'Acide', icon: '🧪', description: 'Nettoyant calcium, lime, rouille' },
+            { name: 'Lime Away', category: 'Acide', icon: '🧪', description: 'Détartrant salle de bain' },
+            
+            { name: 'Eau de Javel', category: 'Base', icon: '🥽', description: 'Désinfectant chloré' },
+            { name: 'Simple Green', category: 'Base', icon: '🥽', description: 'Dégraissant écologique concentré' },
+            { name: 'Purple Power', category: 'Base', icon: '🥽', description: 'Dégraissant industriel violet' },
+            { name: 'Mr Clean', category: 'Base', icon: '🥽', description: 'Nettoyant multi-surfaces' },
+            { name: 'Easy-Off', category: 'Base', icon: '🥽', description: 'Nettoyant four' },
+            
+            { name: 'Roundup', category: 'Toxique', icon: '☠️', description: 'Herbicide glyphosate' },
+            { name: 'Ant B Gon', category: 'Toxique', icon: '☠️', description: 'Insecticide anti-fourmis' },
+            { name: 'Scotts Destructeur de larves', category: 'Toxique', icon: '☠️', description: 'Larvicide pour moustiques' },
+            { name: 'Raid', category: 'Toxique', icon: '☠️', description: 'Insecticide en aérosol' },
+            { name: 'Mort-aux-rats', category: 'Toxique', icon: '☠️', description: 'Rodenticide' },
+            { name: 'Antigel', category: 'Toxique', icon: '☠️', description: 'Éthylène glycol' },
+            
+            { name: 'Peinture latex', category: 'Peinture', icon: '🎨', description: 'Peinture à base d\'eau' },
+            { name: 'Kilz Primer', category: 'Peinture', icon: '🎨', description: 'Apprêt bloqueur de taches' },
+            { name: 'Zinsser', category: 'Peinture', icon: '🎨', description: 'Apprêts professionnels' },
+            { name: 'Benjamin Moore', category: 'Peinture', icon: '🎨', description: 'Peinture murale' },
+            { name: 'Teinture à bois', category: 'Peinture', icon: '🎨', description: 'Colorant pour bois' },
+            
+            { name: 'Huile moteur', category: 'Huiles', icon: '🛢️', description: 'Lubrifiant automobile' },
+            { name: 'WD-40', category: 'Huiles', icon: '🛢️', description: 'Dégrippant lubrifiant' },
+            { name: 'Castrol', category: 'Huiles', icon: '🛢️', description: 'Huile moteur synthétique' },
+            { name: 'Brake Fluid', category: 'Huiles', icon: '🛢️', description: 'Liquide de frein DOT' },
+            
+            { name: 'Acétone', category: 'Organique', icon: '🧴', description: 'Dissolvant pour vernis' },
+            { name: 'Gorilla Glue', category: 'Organique', icon: '🧴', description: 'Adhésif polyuréthane' },
+            { name: 'Goo Gone', category: 'Organique', icon: '🧴', description: 'Enlève-adhésifs et résidus' },
+            { name: 'Silicone', category: 'Organique', icon: '🧴', description: 'Mastic d\'étanchéité' },
+            { name: 'Essence minérale', category: 'Organique', icon: '🧴', description: 'Solvant pour peinture' },
+            
+            { name: 'Essence', category: 'Combustible', icon: '⛽', description: 'Carburant automobile' },
+            { name: 'Propane', category: 'Combustible', icon: '⛽', description: 'Gaz de pétrole liquéfié' },
+            { name: 'Coleman Fuel', category: 'Combustible', icon: '⛽', description: 'Combustible camping' },
+            { name: 'Kérosène', category: 'Combustible', icon: '⛽', description: 'Combustible de chauffage' },
+            
+            { name: 'Chlore piscine', category: 'Comburants', icon: '💥', description: 'Pastilles de chlore' },
+            { name: 'HTH Pool Shock', category: 'Comburants', icon: '💥', description: 'Choc chloré granulaire' },
+            { name: 'Pool Shock', category: 'Comburants', icon: '💥', description: 'Choc chloré piscine' },
+            
+            { name: 'Wella Welloxon Perfect', category: 'Oxydant', icon: '💥', description: 'Crème oxydante professionnelle' },
+            { name: 'Peroxyde d\'hydrogène', category: 'Oxydant', icon: '💥', description: 'Eau oxygénée concentrée' },
+            { name: 'OxyClean', category: 'Oxydant', icon: '💥', description: 'Détachant oxygéné' }
+        ];
+
+        // BASE DE DONNÉES ÉTENDUE pour la recherche intelligente
+        const extendedDatabase = {
+            'scotts': { category: 'Toxique', description: 'Produit de jardinage Scotts', confidence: 'moyenne' },
+            'destructeur larves': { category: 'Toxique', description: 'Larvicide pour moustiques', confidence: 'élevée' },
+            'destructeur de larves': { category: 'Toxique', description: 'Traitement anti-larves', confidence: 'élevée' },
+            'larvicide': { category: 'Toxique', description: 'Produit contre les larves', confidence: 'élevée' },
+            'scotts larvicide': { category: 'Toxique', description: 'Destructeur de larves Scotts', confidence: 'élevée' },
+            'scotts destructeur de larves': { category: 'Toxique', description: 'Larvicide Scotts pour moustiques', confidence: 'élevée' },
+
+            'the ordinary': { category: 'Acide', description: 'Produits de soins acides The Ordinary', confidence: 'élevée' },
+            'ordinary solution': { category: 'Acide', description: 'Solutions acides pour la peau', confidence: 'élevée' },
+            'solution tonique': { category: 'Acide', description: 'Tonique acide pour visage', confidence: 'élevée' },
+            'the ordinary tonique': { category: 'Acide', description: 'Tonique acide The Ordinary', confidence: 'élevée' },
+            'the ordinary solution tonique': { category: 'Acide', description: 'Solution tonique acide The Ordinary', confidence: 'élevée' },
+            'glycolic acid': { category: 'Acide', description: 'Acide glycolique pour peeling', confidence: 'élevée' },
+            'salicylic acid': { category: 'Acide', description: 'Acide salicylique BHA', confidence: 'élevée' },
+            'paula choice': { category: 'Acide', description: 'Produits acides Paula\'s Choice', confidence: 'élevée' },
+
+            'ant b gon': { category: 'Toxique', description: 'Insecticide anti-fourmis Ant B Gon', confidence: 'élevée' },
+            'ant b gone': { category: 'Toxique', description: 'Insecticide anti-fourmis', confidence: 'élevée' },
+            'wasp b gon': { category: 'Toxique', description: 'Insecticide anti-guêpes', confidence: 'élevée' },
+            'roach b gon': { category: 'Toxique', description: 'Insecticide anti-cafards', confidence: 'élevée' },
+
+            'welloxon': { category: 'Oxydant', description: 'Oxydant Wella', confidence: 'élevée' },
+            'wella welloxon': { category: 'Oxydant', description: 'Crème oxydante Wella', confidence: 'élevée' },
+            'welloxon perfect': { category: 'Oxydant', description: 'Oxydant professionnel Wella', confidence: 'élevée' },
+            'wella welloxon perfect': { category: 'Oxydant', description: 'Crème oxydante professionnelle Wella', confidence: 'élevée' },
+            'wella welloxon perfect 10': { category: 'Oxydant', description: 'Oxydant 3% Wella Welloxon Perfect', confidence: 'élevée' },
+
+            'simple green': { category: 'Base', description: 'Dégraissant écologique concentré', confidence: 'élevée' },
+            'purple power': { category: 'Base', description: 'Dégraissant industriel violet', confidence: 'élevée' },
+            'krud kutter': { category: 'Base', description: 'Dégraissant multi-usage', confidence: 'élevée' },
+            'mean green': { category: 'Base', description: 'Dégraissant concentré', confidence: 'élevée' },
+
+            'chemical guys': { category: 'Organique', description: 'Produits détailing automobile', confidence: 'moyenne' },
+            'meguiars': { category: 'Organique', description: 'Cires et polish automobile', confidence: 'élevée' },
+            'turtle wax': { category: 'Organique', description: 'Cires automobile', confidence: 'élevée' },
+            'armor all': { category: 'Organique', description: 'Protecteurs plastique auto', confidence: 'élevée' },
+
+            'gorilla glue': { category: 'Organique', description: 'Adhésif polyuréthane', confidence: 'élevée' },
+            'goo gone': { category: 'Organique', description: 'Enlève résidus collants', confidence: 'élevée' },
+            'goof off': { category: 'Organique', description: 'Enlève-adhésifs solvant', confidence: 'élevée' },
+            'silicone': { category: 'Organique', description: 'Mastic d\'étanchéité silicone', confidence: 'élevée' },
+            'mastic silicone': { category: 'Organique', description: 'Produit d\'étanchéité silicone', confidence: 'élevée' },
+
+            'kilz': { category: 'Peinture', description: 'Apprêts et scellants', confidence: 'élevée' },
+            'kilz primer': { category: 'Peinture', description: 'Apprêt bloqueur de taches Kilz', confidence: 'élevée' },
+            'zinsser': { category: 'Peinture', description: 'Apprêts professionnels', confidence: 'élevée' },
+
+            'coleman fuel': { category: 'Combustible', description: 'Combustible camping', confidence: 'élevée' },
+            'sterno': { category: 'Combustible', description: 'Combustible gel', confidence: 'élevée' },
+            'propane': { category: 'Combustible', description: 'Gaz propane', confidence: 'élevée' },
+
+            'hth': { category: 'Comburants', description: 'Produits chlorés piscine HTH', confidence: 'élevée' },
+            'pool shock': { category: 'Comburants', description: 'Choc chloré piscine', confidence: 'élevée' },
+            'chlore piscine': { category: 'Comburants', description: 'Produits chlorés pour piscine', confidence: 'élevée' },
+
+            'oxyclean': { category: 'Oxydant', description: 'Détachant oxygéné', confidence: 'élevée' },
+            'peroxyde': { category: 'Oxydant', description: 'Peroxyde d\'hydrogène', confidence: 'élevée' },
+            'eau oxygénée': { category: 'Oxydant', description: 'Peroxyde d\'hydrogène', confidence: 'élevée' }
+        };
+
+        // Fonctions utilitaires
+        function getAllProducts() {
+            return [...defaultProducts, ...customProducts];
+        }
+
+        function loadCustomProducts() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const stored = localStorage.getItem('customProducts');
+                    if (stored) {
+                        customProducts = JSON.parse(stored);
+                    }
+                }
+            } catch (e) {
+                customProducts = [];
+            }
+        }
+
+        function saveCustomProducts() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem('customProducts', JSON.stringify(customProducts));
+                }
+            } catch (e) {
+                console.warn('Impossible de sauvegarder dans localStorage');
+            }
+        }
+
+        function updateCounts() {
+            const total = getAllProducts().length;
+            document.getElementById('defaultCount').textContent = defaultProducts.length;
+            document.getElementById('customCount').textContent = customProducts.length;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('footerTotal').textContent = total;
+            
+            const footerCustom = document.getElementById('footerCustom');
+            if (customProducts.length > 0) {
+                footerCustom.textContent = ` (${customProducts.length} personnalisés)`;
+            } else {
+                footerCustom.textContent = '';
+            }
+        }
+
+        function getCategoryCounts() {
+            const counts = {};
+            getAllProducts().forEach(product => {
+                counts[product.category] = (counts[product.category] || 0) + 1;
+            });
+            return counts;
+        }
+
+        // Fonctions principales
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            const isHidden = panel.style.display === 'none' || panel.style.display === '';
+            panel.style.display = isHidden ? 'block' : 'none';
+        }
+
+        function toggleAddProduct() {
+            const form = document.getElementById('addProductForm');
+            const isHidden = form.style.display === 'none' || form.style.display === '';
+            form.style.display = isHidden ? 'block' : 'none';
+        }
+
+        function addProduct() {
+            const name = document.getElementById('newProductName').value.trim();
+            const category = document.getElementById('newProductCategory').value;
+            const description = document.getElementById('newProductDesc').value.trim();
+
+            if (!name || !description) {
+                alert('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+
+            const newProduct = {
+                name: name,
+                category: category,
+                description: description,
+                icon: categoryIcons[category],
+                custom: true
+            };
+
+            customProducts.push(newProduct);
+            saveCustomProducts();
+            updateCounts();
+            displayCategories();
+
+            document.getElementById('newProductName').value = '';
+            document.getElementById('newProductDesc').value = '';
+            toggleAddProduct();
+
+            alert('Produit ajouté avec succès !');
+        }
+
+        function exportDatabase() {
+            const dataToExport = {
+                customProducts: customProducts,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            const dataStr = JSON.stringify(dataToExport, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `classification-rdd-pats-projects-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        function handleSearch() {
+            const input = document.getElementById('searchInput');
+            const query = input.value.toLowerCase().trim();
+            const suggestionsDiv = document.getElementById('suggestions');
+            const autoSearchBtn = document.getElementById('autoSearchBtn');
+            
+            if (query.length === 0) {
+                suggestionsDiv.style.display = 'none';
+                autoSearchBtn.style.display = 'none';
+                return;
+            }
+
+            const filtered = getAllProducts().filter(product => 
+                product.name.toLowerCase().includes(query)
+            ).slice(0, 5);
+
+            if (filtered.length === 0) {
+                if (query.length > 2) {
+                    suggestionsDiv.innerHTML = '<div class="no-results">Aucun produit trouvé. Cliquez sur 🌐 pour rechercher.</div>';
+                    suggestionsDiv.style.display = 'block';
+                    autoSearchBtn.style.display = 'block';
+                } else {
+                    suggestionsDiv.style.display = 'none';
+                    autoSearchBtn.style.display = 'none';
+                }
+                return;
+            }
+
+            suggestionsDiv.innerHTML = filtered.map((product, index) => `
+                <div class="suggestion" data-product='${JSON.stringify(product)}'>
+                    <div class="suggestion-content">
+                        <div class="suggestion-icon">${product.icon}</div>
+                        <div class="suggestion-info">
+                            <div class="suggestion-name">${product.name}</div>
+                            <div class="suggestion-desc">${product.description}</div>
+                            <div class="suggestion-badges">
+                                <div class="suggestion-category category-${product.category.toLowerCase()}">${product.category}</div>
+                                ${product.autoAdded ? '<div class="auto-added-badge">Auto-ajouté</div>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.suggestion').forEach(suggestion => {
+                suggestion.addEventListener('click', function() {
+                    const product = JSON.parse(this.dataset.product);
+                    selectProduct(product);
+                });
+            });
+            
+            suggestionsDiv.style.display = 'block';
+            autoSearchBtn.style.display = 'none';
+        }
+
+        function selectProduct(product) {
+            selectedProduct = product;
+            document.getElementById('searchInput').value = product.name;
+            document.getElementById('suggestions').style.display = 'none';
+            document.getElementById('autoSearchBtn').style.display = 'none';
+            showSelectedProduct(product);
+        }
+
+        function showSelectedProduct(product) {
+            const config = categoryConfig[product.category];
+            const resultBox = document.getElementById('resultBox');
+            
+            resultBox.innerHTML = `
+                <div class="result-header">
+                    <div class="result-icon">${product.icon}</div>
+                    <div class="result-info">
+                        <div class="result-name">${product.name}</div>
+                        <div class="result-desc">${product.description}</div>
+                        ${product.autoAdded ? '<div class="auto-added-result">✨ Ajouté automatiquement</div>' : ''}
+                        ${product.confidence ? `<div class="confidence-badge confidence-${product.confidence}">Confiance: ${product.confidence}</div>` : ''}
+                    </div>
+                </div>
+                <div class="classification">
+                    <div class="classification-title">
+                        <span>📊</span>
+                        <span>Classification RDD:</span>
+                    </div>
+                    <div class="classification-badge" style="background: ${config.color}">
+                        📍 ${product.category}
+                    </div>
+                    <div class="classification-desc">${config.desc}</div>
+                    <div class="instructions">
+                        <div class="instructions-title">💡 Instructions de disposition:</div>
+                        <div class="instructions-text">
+                            Apportez ce produit à un écocentre ou point de collecte de résidus domestiques dangereux. 
+                            Ne pas jeter aux ordures ménagères ou à l'égout.
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultBox.style.display = 'block';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                if (!searchTerm) return;
+                
+                const allProducts = getAllProducts();
+                const exactMatch = allProducts.find(product => 
+                    product.name.toLowerCase() === searchTerm.toLowerCase()
+                );
+                
+                if (exactMatch) {
+                    selectProduct(exactMatch);
+                } else {
+                    const suggestions = allProducts.filter(product =>
+                        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                    
+                    if (suggestions.length > 0) {
+                        selectProduct(suggestions[0]);
+                    } else {
+                        autoSearch();
+                    }
+                }
+            }
+        }
+
+        // FONCTION DE RECHERCHE INTELLIGENTE
+        async function autoSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (!searchTerm || isSearching) return;
+
+            isSearching = true;
+            document.getElementById('searchingFor').textContent = searchTerm;
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('autoSearchBtn').style.display = 'none';
+
+            try {
+                console.log(`🔍 Recherche intelligente pour: "${searchTerm}"`);
+                
+                // 1. Recherche dans la base étendue
+                const extendedResult = searchExtendedDatabase(searchTerm);
+                if (extendedResult) {
+                    console.log('✅ Trouvé dans la base étendue:', extendedResult);
+                    createAndAddProduct(searchTerm, extendedResult.category, extendedResult.description, extendedResult.confidence, 'Base étendue');
+                    return;
+                }
+
+                // 2. Analyse sémantique intelligente
+                const semanticResult = performSemanticAnalysis(searchTerm);
+                if (semanticResult) {
+                    console.log('✅ Classification sémantique réussie:', semanticResult);
+                    createAndAddProduct(searchTerm, semanticResult.category, semanticResult.description, semanticResult.confidence, 'Analyse sémantique');
+                    return;
+                }
+
+                // 3. Classification par patterns
+                const patternResult = performPatternAnalysis(searchTerm);
+                if (patternResult) {
+                    console.log('✅ Classification par patterns réussie:', patternResult);
+                    createAndAddProduct(searchTerm, patternResult.category, patternResult.description, 'faible', 'Classification patterns');
+                } else {
+                    alert(`❌ Impossible de classifier "${searchTerm}". 
+                    
+Essayez:
+• Un nom plus spécifique
+• Le nom de la marque
+• Le type de produit`);
+                }
+
+            } catch (error) {
+                console.error('❌ Erreur de recherche intelligente:', error);
+                alert(`❌ Erreur lors de la recherche de "${searchTerm}".`);
+            } finally {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                isSearching = false;
+            }
+        }
+
+        // Recherche dans la base étendue
+        function searchExtendedDatabase(searchTerm) {
+            console.log(`📚 Recherche dans la base étendue: "${searchTerm}"`);
+            
+            const searchTermLower = searchTerm.toLowerCase();
+            
+            if (extendedDatabase[searchTermLower]) {
+                console.log(`✅ Correspondance exacte: "${searchTermLower}"`);
+                return extendedDatabase[searchTermLower];
+            }
+            
+            let bestMatch = null;
+            let bestScore = 0;
+            let bestKey = '';
+            
+            for (const [key, product] of Object.entries(extendedDatabase)) {
+                let score = 0;
+                
+                if (searchTermLower.includes(key)) {
+                    score += key.length * 10;
+                }
+                if (key.includes(searchTermLower)) {
+                    score += searchTermLower.length * 8;
+                }
+                
+                const searchWords = searchTermLower.split(/\s+/).filter(w => w.length > 2);
+                const keyWords = key.split(/\s+/).filter(w => w.length > 2);
+                
+                for (const searchWord of searchWords) {
+                    for (const keyWord of keyWords) {
+                        if (searchWord === keyWord) {
+                            score += 20;
+                        } else if (searchWord.includes(keyWord) && keyWord.length > 3) {
+                            score += 12;
+                        } else if (keyWord.includes(searchWord) && searchWord.length > 3) {
+                            score += 10;
+                        }
+                    }
+                }
+                
+                if (product.confidence === 'élevée') {
+                    score += 5;
+                }
+                
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMatch = product;
+                    bestKey = key;
+                }
+            }
+            
+            if (bestMatch && bestScore >= 15) {
+                console.log(`✅ Correspondance base étendue (score: ${bestScore}): "${bestKey}" → ${bestMatch.category}`);
+                return bestMatch;
+            }
+            
+            console.log(`❌ Aucune correspondance dans la base étendue (meilleur score: ${bestScore})`);
+            return null;
+        }
+
+        // Analyse sémantique
+        function performSemanticAnalysis(searchTerm) {
+            console.log(`🧠 Analyse sémantique: "${searchTerm}"`);
+            
+            const queryLower = searchTerm.toLowerCase();
+            
+            const semanticPatterns = {
+                'Toxique': {
+                    keywords: ['pesticide', 'herbicide', 'insecticide', 'poison', 'toxic', 'kill', 'ant', 'roach', 'bug', 'weed', 'rat', 'mouse', 'larvae', 'larves', 'killer', 'bait', 'control', 'roundup', 'raid', 'scotts', 'destructeur'],
+                    weight: 10
+                },
+                'Acide': {
+                    keywords: ['acid', 'acide', 'glycolic', 'salicylic', 'lactic', 'mandelic', 'aha', 'bha', 'peeling', 'ordinary', 'paula', 'tonique', 'solution'],
+                    weight: 10
+                },
+                'Oxydant': {
+                    keywords: ['oxydant', 'developer', 'révélateur', 'welloxon', 'peroxide', 'hair', 'coloration', 'bleach', 'wella', 'loreal'],
+                    weight: 8
+                },
+                'Base': {
+                    keywords: ['cleaner', 'nettoyant', 'degreaser', 'dégraissant', 'ammonia', 'javel', 'simple', 'green', 'purple', 'power'],
+                    weight: 7
+                },
+                'Organique': {
+                    keywords: ['solvent', 'solvant', 'acetone', 'alcohol', 'thinner', 'silicone', 'mastic', 'adhesive', 'glue', 'goo', 'gone'],
+                    weight: 8
+                },
+                'Peinture': {
+                    keywords: ['paint', 'peinture', 'primer', 'stain', 'varnish', 'coating', 'kilz', 'zinsser'],
+                    weight: 7
+                },
+                'Huiles': {
+                    keywords: ['oil', 'huile', 'lubricant', 'grease', 'motor', 'wd', '40', 'brake'],
+                    weight: 8
+                },
+                'Combustible': {
+                    keywords: ['fuel', 'gas', 'gasoline', 'propane', 'butane', 'diesel', 'coleman', 'sterno'],
+                    weight: 9
+                },
+                'Comburants': {
+                    keywords: ['chlorine', 'chlore', 'pool', 'piscine', 'shock', 'hth'],
+                    weight: 8
+                }
+            };
+
+            let bestCategory = null;
+            let bestScore = 0;
+            let matchDetails = [];
+
+            for (const [category, data] of Object.entries(semanticPatterns)) {
+                let score = 0;
+                let matches = [];
+
+                for (const keyword of data.keywords) {
+                    if (queryLower.includes(keyword)) {
+                        const keywordScore = keyword.length * data.weight;
+                        score += keywordScore;
+                        matches.push(`"${keyword}" (+${keywordScore})`);
+                    }
+                }
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestCategory = category;
+                    matchDetails = matches;
+                }
+            }
+
+            if (bestCategory && bestScore > 10) {
+                console.log(`✅ Analyse sémantique réussie: ${bestCategory} (score: ${bestScore})`);
+                return {
+                    category: bestCategory,
+                    description: `Classifié par analyse sémantique (${matchDetails.length} correspondances)`,
+                    confidence: bestScore > 50 ? 'élevée' : bestScore > 25 ? 'moyenne' : 'faible'
+                };
+            }
+
+            console.log(`❌ Analyse sémantique échouée (meilleur score: ${bestScore})`);
+            return null;
+        }
+
+        // Classification par patterns
+        function performPatternAnalysis(searchTerm) {
+            console.log(`🔤 Analyse par patterns: "${searchTerm}"`);
+            
+            const queryLower = searchTerm.toLowerCase();
+            
+            const patterns = [
+                { pattern: /.*cide$/i, category: 'Toxique', description: 'Produit avec suffixe -cide' },
+                { pattern: /.*acid.*/i, category: 'Acide', description: 'Produit contenant "acid"' },
+                { pattern: /.*clean.*/i, category: 'Base', description: 'Produit nettoyant' },
+                { pattern: /.*oil.*/i, category: 'Huiles', description: 'Produit huileux' },
+                { pattern: /.*paint.*/i, category: 'Peinture', description: 'Produit de peinture' },
+                { pattern: /.*fuel.*/i, category: 'Combustible', description: 'Combustible' }
+            ];
+
+            for (const { pattern, category, description } of patterns) {
+                if (pattern.test(queryLower)) {
+                    console.log(`✅ Pattern trouvé: ${pattern} → ${category}`);
+                    return { category, description };
+                }
+            }
+
+            console.log(`❌ Aucun pattern trouvé`);
+            return null;
+        }
+
+        // Créer et ajouter un produit
+        function createAndAddProduct(name, category, description, confidence, searchMethod) {
+            const newProduct = {
+                name: name,
+                category: category,
+                description: description,
+                icon: categoryIcons[category],
+                autoAdded: true,
+                custom: true,
+                confidence: confidence,
+                searchMethod: searchMethod
+            };
+
+            console.log('🆕 Nouveau produit créé:', newProduct);
+
+            customProducts.push(newProduct);
+            saveCustomProducts();
+            selectProduct(newProduct);
+            updateCounts();
+            displayCategories();
+        }
+
+        function displayCategories() {
+            const counts = getCategoryCounts();
+            const container = document.getElementById('categoriesContainer');
+            
+            container.innerHTML = Object.entries(categoryConfig).map(([category, config]) => {
+                const count = counts[category] || 0;
+                const icon = categoryIcons[category];
+                
+                return `
+                    <div class="category-card" style="background: ${config.bg}; border-left-color: ${config.color};">
+                        <div class="category-header">
+                            <div class="category-icon" style="background: ${config.color};">
+                                ${icon}
+                            </div>
+                            <div class="category-details">
+                                <div class="category-name" style="color: ${config.color};">
+                                    ${category}
+                                </div>
+                                <div class="category-description">${config.desc}</div>
+                                <div class="category-count">${count} produits</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialisation avec event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCustomProducts();
+            updateCounts();
+            displayCategories();
+            
+            document.getElementById('adminBtn').addEventListener('click', toggleAdmin);
+            document.getElementById('addProductBtn').addEventListener('click', toggleAddProduct);
+            document.getElementById('exportBtn').addEventListener('click', exportDatabase);
+            document.getElementById('addProductSubmit').addEventListener('click', addProduct);
+            document.getElementById('addProductCancel').addEventListener('click', toggleAddProduct);
+            document.getElementById('autoSearchBtn').addEventListener('click', autoSearch);
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+            document.getElementById('searchInput').addEventListener('keypress', handleKeyPress);
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-box')) {
+                    document.getElementById('suggestions').style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>,
+            
