@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classification RDD - PaT's_PrOjEcT's</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #059669, #047857); color: white; padding: 20px; text-align: center; position: relative; }
+        .header h1 { font-size: 20px; font-weight: bold; margin-bottom: 3px; }
+        .header .subtitle { font-size: 12px; opacity: 0.9; margin-bottom: 3px; }
+        .header .description { font-size: 14px; opacity: 0.8; }
+        .admin-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .admin-panel { background: #f3f4f6; border-bottom: 2px solid #d1d5db; padding: 15px; display: none; }
+        .admin-buttons { display: grid; gap: 10px; }
+        .admin-btn-full { padding: 12px 15px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; text-align: center; font-size: 14px; }
+        .btn-blue { background: #3b82f6; color: white; }
+        .btn-green { background: #059669; color: white; }
+        .btn-red { background: #dc2626; color: white; }
+        .stats-box { background: white; padding: 12px; border-radius: 6px; font-size: 14px; color: #6b7280; margin-top: 10px; }
+        .search-box { padding: 15px; background: #f9f9f9; }
+        .search-container { position: relative; }
+        .search-input { width: 100%; padding: 12px 15px 12px 45px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 16px; }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #9ca3af; width: 20px; height: 20px; }
+        .auto-search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #3b82f6; color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; display: none; }
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10; max-height: 300px; overflow-y: auto; display: none; }
+        .suggestion { padding: 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; }
+        .suggestion:hover { background: #f9fafb; }
+        .result-box { margin: 15px; padding: 15px; background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 8px; display: none; }
+        .categories { padding: 15px; }
+        .category-card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 12px; border-left: 4px solid; }
+        .category-header { display: flex; align-items: center; gap: 12px; }
+        .category-icon { font-size: 20px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+        .footer { background: #f3f4f6; padding: 15px; text-align: center; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Classification RDD</h1>
+            <p class="subtitle">par PaT's_PrOjEcT's</p>
+            <p class="description">Résidus domestiques dangereux</p>
+            <button class="admin-btn" onclick="toggleAdmin()">⚙️ Admin</button>
+        </div>
+
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-buttons">
+                <button class="admin-btn-full btn-blue" onclick="toggleAddProduct()">➕ Ajouter un produit</button>
+                <button class="admin-btn-full btn-green" onclick="toggleApiConfig()">🔑 Configurer API DeepSeek</button>
+                <button class="admin-btn-full btn-green" onclick="exportDatabase()">📤 Exporter base de données</button>
+                <button class="admin-btn-full btn-red" onclick="clearCustomProducts()">🗑️ Supprimer produits personnalisés</button>
+                <div class="stats-box">
+                    <div><strong>Classification RDD - PaT's_PrOjEcT's</strong></div>
+                    <div>• Produits par défaut: <span id="defaultCount">250+</span></div>
+                    <div>• Produits personnalisés: <span id="customCount">0</span></div>
+                    <div>• Total: <span id="totalCount">250+</span></div>
+                    <div id="apiStatus" style="margin-top: 8px; padding: 8px; background: #fee2e2; color: #991b1b; border-radius: 6px; font-size: 12px;">
+                        🔴 API DeepSeek non configurée
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire ajout produit -->
+        <div id="addProductForm" style="background: #eff6ff; border-bottom: 2px solid #93c5fd; padding: 15px; display: none;">
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">➕ Ajouter un nouveau produit</h3>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 5px;">Nom du produit *</label>
+                <input type="text" id="newProductName" placeholder="Ex: WD-40, Roundup, etc." style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 5px;">Catégorie RDD *</label>
+                <select id="newProductCategory" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                    <option value="Acide">🧪 Acide</option>
+                    <option value="Base">🥽 Base</option>
+                    <option value="Oxydant">💥 Oxydant</option>
+                    <option value="Toxique">☠️ Toxique</option>
+                    <option value="Peinture">🎨 Peinture</option>
+                    <option value="Organique">🧴 Organique</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 5px;">Description *</label>
+                <input type="text" id="newProductDesc" placeholder="Ex: Dégrippant lubrifiant, Herbicide glyphosate, etc." style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 15px;">
+                <button onclick="addProduct()" style="flex: 1; padding: 12px 15px; background: #059669; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer;">✅ Ajouter</button>
+                <button onclick="toggleAddProduct()" style="flex: 1; padding: 12px 15px; background: #6b7280; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer;">❌ Annuler</button>
+            </div>
+        </div>
+
+        <!-- Formulaire API DeepSeek -->
+        <div id="apiConfigForm" style="background: #f0f9ff; border-bottom: 2px solid #0ea5e9; padding: 15px; display: none;">
+            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">🔑 Configuration API DeepSeek</h3>
+            <div style="background: #e0f2fe; border: 1px solid #0ea5e9; border-radius: 6px; padding: 12px; margin-bottom: 15px; font-size: 12px; color: #0c4a6e;">
+                🤖 <strong>Comment obtenir votre clé API DeepSeek :</strong><br>
+                1. Visitez <a href="https://platform.deepseek.com/" target="_blank">DeepSeek Platform</a><br>
+                2. Créez un compte ou connectez-vous<br>
+                3. Allez dans "API Keys" dans votre profil<br>
+                4. Cliquez sur "Create new secret key"<br>
+                5. Copiez votre clé API (elle commence par "sk-")<br><br>
+                <strong>⚠️ La clé doit commencer par "sk-"</strong>
+            </div>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 5px;">Clé API DeepSeek *</label>
+                <input type="password" id="deepseekApiKey" placeholder="sk-..." style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 15px;">
+                <button onclick="saveApiConfiguration()" style="flex: 1; padding: 12px 15px; background: #059669; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer;">✅ Sauvegarder</button>
+                <button onclick="toggleApiConfig()" style="flex: 1; padding: 12px 15px; background: #6b7280; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer;">❌ Annuler</button>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <div class="search-container">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" class="search-input" placeholder="Rechercher un produit (ex: chlore, acide, peinture...)" oninput="handleSearch()" onkeypress="handleKeyPress(event)">
+                <button class="auto-search-btn" id="autoSearchBtn" onclick="alert('Fonctionnalité IA - Configurez DeepSeek dans Admin')">🤖</button>
+            </div>
+            <div class="suggestions" id="suggestions"></div>
+        </div>
+
+        <div class="result-box" id="resultBox"></div>
+
+        <div class="categories">
+            <h2>📋 Catégories de disposition</h2>
+            <div id="categoriesContainer">
+                <div class="category-card" style="border-left-color: #dc2626;">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: #dc2626;">🧪</div>
+                        <div>
+                            <div style="font-weight: 600; color: #dc2626;">Acide (30+ produits)</div>
+                            <div style="font-size: 14px; color: #6b7280;">Substances corrosives acides</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-card" style="border-left-color: #2563eb;">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: #2563eb;">🥽</div>
+                        <div>
+                            <div style="font-weight: 600; color: #2563eb;">Base (35+ produits)</div>
+                            <div style="font-size: 14px; color: #6b7280;">Substances corrosives basiques</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-card" style="border-left-color: #7c3aed;">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: #7c3aed;">☠️</div>
+                        <div>
+                            <div style="font-weight: 600; color: #7c3aed;">Toxique (50+ produits)</div>
+                            <div style="font-size: 14px; color: #6b7280;">Pesticides, herbicides, poisons</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-card" style="border-left-color: #059669;">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: #059669;">🎨</div>
+                        <div>
+                            <div style="font-weight: 600; color: #059669;">Peinture (40+ produits)</div>
+                            <div style="font-size: 14px; color: #6b7280;">Peintures et solvants associés</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-card" style="border-left-color: #0d9488;">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: #0d9488;">🧴</div>
+                        <div>
+                            <div style="font-weight: 600; color: #0d9488;">Organique (60+ produits)</div>
+                            <div style="font-size: 14px; color: #6b7280;">Solvants, huiles, lubrifiants, combustibles</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-card" style="border-left-color: #eab308;">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: #eab308;">💥</div>
+                        <div>
+                            <div style="font-weight: 600; color: #eab308;">Oxydant (35+ produits)</div>
+                            <div style="font-size: 14px; color: #6b7280;">Agents oxydants, comburants, chlore piscine</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🌱 Classification RDD par PaT's_PrOjEcT's</p>
+            <p>Base de données: 250+ produits</p>
+            <p style="font-size: 12px; margin-top: 8px;">📧 Contact: <a href="mailto:pat.s.project.s.for.us@gmail.com" style="color: #059669; text-decoration: none;">pat.s.project.s.for.us@gmail.com</a></p>
+            <p style="font-size: 12px; margin-top: 4px;">© 2025 PaT's_PrOjEcT's - Propulsé par DeepSeek AI</p>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let customProducts = [];
+        let apiConfig = { deepseekApiKey: '', configured: false };
+
+        // Base de données simplifiée pour test - CATÉGORIES REGROUPÉES
+        const sampleProducts = [
+            { name: 'WD-40', category: 'Organique', icon: '🧴', description: 'Dégrippant lubrifiant' },
+            { name: 'Roundup', category: 'Toxique', icon: '☠️', description: 'Herbicide glyphosate' },
+            { name: 'Eau de Javel', category: 'Base', icon: '🥽', description: 'Désinfectant chloré' },
+            { name: 'Acide muriatique', category: 'Acide', icon: '🧪', description: 'Nettoyant piscine' },
+            { name: 'Kilz Primer', category: 'Peinture', icon: '🎨', description: 'Apprêt bloqueur de taches' },
+            { name: 'Acétone', category: 'Organique', icon: '🧴', description: 'Dissolvant pour vernis' },
+            { name: 'Essence', category: 'Organique', icon: '🧴', description: 'Carburant automobile' },
+            { name: 'Chlore piscine', category: 'Oxydant', icon: '💥', description: 'Pastilles de chlore' },
+            { name: 'Peroxyde d\'hydrogène', category: 'Oxydant', icon: '💥', description: 'Eau oxygénée' }
+        ];
+
+        const categoryIcons = {
+            'Acide': '🧪', 'Base': '🥽', 'Oxydant': '💥',
+            'Toxique': '☠️', 'Peinture': '🎨', 'Organique': '🧴'
+        };
+
+        // Chargement des données
+        function loadData() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const stored = localStorage.getItem('customProducts');
+                    if (stored) {
+                        customProducts = JSON.parse(stored);
+                        updateCounts();
+                    }
+                    
+                    const storedApi = localStorage.getItem('deepseekApiConfig');
+                    if (storedApi) {
+                        apiConfig = JSON.parse(storedApi);
+                        updateApiStatus();
+                    }
+                }
+            } catch (e) {
+                console.warn('Erreur chargement:', e);
+            }
+        }
+
+        function saveCustomProducts() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem('customProducts', JSON.stringify(customProducts));
+                }
+            } catch (e) {
+                console.warn('Erreur sauvegarde:', e);
+            }
+        }
+
+        function saveApiConfig() {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem('deepseekApiConfig', JSON.stringify(apiConfig));
+                }
+            } catch (e) {
+                console.warn('Erreur sauvegarde API:', e);
+            }
+        }
+
+        function updateCounts() {
+            const total = sampleProducts.length + customProducts.length;
+            document.getElementById('customCount').textContent = customProducts.length;
+            document.getElementById('totalCount').textContent = total;
+        }
+
+        function updateApiStatus() {
+            const status = document.getElementById('apiStatus');
+            if (apiConfig.configured) {
+                status.style.background = '#dcfce7';
+                status.style.color = '#166534';
+                status.textContent = '🟢 API DeepSeek configurée';
+            } else {
+                status.style.background = '#fee2e2';
+                status.style.color = '#991b1b';
+                status.textContent = '🔴 API DeepSeek non configurée';
+            }
+        }
+
+        function getAllProducts() {
+            return [...sampleProducts, ...customProducts];
+        }
+
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleAddProduct() {
+            const form = document.getElementById('addProductForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleApiConfig() {
+            const form = document.getElementById('apiConfigForm');
+            const isHidden = form.style.display === 'none' || form.style.display === '';
+            
+            if (isHidden) {
+                document.getElementById('deepseekApiKey').value = apiConfig.deepseekApiKey || '';
+            }
+            
+            form.style.display = isHidden ? 'block' : 'none';
+        }
+
+        function addProduct() {
+            const name = document.getElementById('newProductName').value.trim();
+            const category = document.getElementById('newProductCategory').value;
+            const description = document.getElementById('newProductDesc').value.trim();
+
+            if (!name || !description) {
+                alert('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+
+            const newProduct = {
+                name: name,
+                category: category,
+                description: description,
+                icon: categoryIcons[category],
+                custom: true
+            };
+
+            customProducts.push(newProduct);
+            saveCustomProducts();
+            updateCounts();
+
+            // Reset form
+            document.getElementById('newProductName').value = '';
+            document.getElementById('newProductDesc').value = '';
+            toggleAddProduct();
+
+            alert(`✅ Produit "${name}" ajouté avec succès !`);
+        }
+
+        function saveApiConfiguration() {
+            const key = document.getElementById('deepseekApiKey').value.trim();
+
+            if (!key) {
+                alert('Veuillez entrer votre clé API DeepSeek');
+                return;
+            }
+
+            if (!key.startsWith('sk-')) {
+                alert('❌ La clé API DeepSeek doit commencer par "sk-"');
+                return;
+            }
+
+            apiConfig = {
+                deepseekApiKey: key,
+                configured: true
+            };
+
+            saveApiConfig();
+            updateApiStatus();
+            toggleApiConfig();
+            
+            alert('✅ Configuration API DeepSeek sauvegardée avec succès !');
+        }
+
+        function exportDatabase() {
+            const dataToExport = {
+                customProducts: customProducts,
+                exportDate: new Date().toISOString(),
+                version: '2.0-deepseek',
+                apiConfigured: apiConfig.configured
+            };
+
+            const dataStr = JSON.stringify(dataToExport, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `classification-rdd-deepseek-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            alert('✅ Base de données exportée avec succès !');
+        }
+
+        function clearCustomProducts() {
+            if (customProducts.length === 0) {
+                alert('Aucun produit personnalisé à supprimer.');
+                return;
+            }
+
+            const count = customProducts.length;
+            const confirmMsg = `⚠️ ATTENTION ⚠️\n\nVous allez supprimer ${count} produits personnalisés.\nCette action est IRRÉVERSIBLE !\n\nÊtes-vous sûr ?`;
+
+            if (confirm(confirmMsg)) {
+                if (confirm(`🔴 DERNIÈRE CONFIRMATION\n\nSupprimer définitivement ${count} produits ?`)) {
+                    customProducts = [];
+                    saveCustomProducts();
+                    updateCounts();
+                    alert(`✅ ${count} produits personnalisés supprimés !`);
+                }
+            }
+        }
+
+        // FONCTION DE RECHERCHE AMÉLIORÉE
+        function handleSearch() {
+            const input = document.querySelector('.search-input');
+            const query = input.value.toLowerCase().trim();
+            const suggestions = document.getElementById('suggestions');
+            const autoBtn = document.getElementById('autoSearchBtn');
+
+            if (query.length === 0) {
+                suggestions.style.display = 'none';
+                autoBtn.style.display = 'none';
+                return;
+            }
+
+            const allProducts = getAllProducts();
+            
+            // Recherche améliorée : nom + description + mots individuels
+            const filtered = allProducts.filter(p => {
+                const name = p.name.toLowerCase();
+                const description = p.description.toLowerCase();
+                const searchText = (name + ' ' + description).toLowerCase();
+                
+                // Recherche par mots individuels
+                const queryWords = query.split(' ').filter(word => word.length > 0);
+                
+                // Le produit correspond si :
+                // 1. Le nom contient la requête complète
+                // 2. La description contient la requête complète  
+                // 3. Tous les mots de la requête sont présents dans nom+description
+                return name.includes(query) || 
+                       description.includes(query) || 
+                       queryWords.every(word => searchText.includes(word));
+            })
+            // Trier par pertinence : nom exact > nom partiel > description
+            .sort((a, b) => {
+                const aName = a.name.toLowerCase();
+                const bName = b.name.toLowerCase();
+                const aDesc = a.description.toLowerCase();
+                const bDesc = b.description.toLowerCase();
+                
+                // Priorité 1: Nom exact
+                if (aName === query && bName !== query) return -1;
+                if (bName === query && aName !== query) return 1;
+                
+                // Priorité 2: Nom commence par la requête
+                if (aName.startsWith(query) && !bName.startsWith(query)) return -1;
+                if (bName.startsWith(query) && !aName.startsWith(query)) return 1;
+                
+                // Priorité 3: Nom contient la requête
+                if (aName.includes(query) && !bName.includes(query)) return -1;
+                if (bName.includes(query) && !aName.includes(query)) return 1;
+                
+                // Priorité 4: Description contient la requête
+                if (aDesc.includes(query) && !bDesc.includes(query)) return -1;
+                if (bDesc.includes(query) && !aDesc.includes(query)) return 1;
+                
+                // Ordre alphabétique par défaut
+                return aName.localeCompare(bName);
+            })
+            .slice(0, 5); // Limiter à 5 résultats
+
+            if (filtered.length === 0) {
+                if (query.length > 2) {
+                    suggestions.innerHTML = '<div style="padding: 12px; text-align: center; color: #666;">Aucun produit trouvé. Cliquez 🤖 pour l\'IA.</div>';
+                    suggestions.style.display = 'block';
+                    autoBtn.style.display = apiConfig.configured ? 'block' : 'none';
+                } else {
+                    suggestions.style.display = 'none';
+                    autoBtn.style.display = 'none';
+                }
+                return;
+            }
+
+            // Fonction pour surligner les mots trouvés
+            function highlightMatch(text, query) {
+                const words = query.split(' ').filter(word => word.length > 0);
+                let highlighted = text;
+                
+                words.forEach(word => {
+                    const regex = new RegExp(`(${word})`, 'gi');
+                    highlighted = highlighted.replace(regex, '<mark style="background: #fef3c7; padding: 1px 2px; border-radius: 2px;">$1</mark>');
+                });
+                
+                return highlighted;
+            }
+
+            suggestions.innerHTML = filtered.map(product => {
+                const highlightedName = highlightMatch(product.name, query);
+                const highlightedDesc = highlightMatch(product.description, query);
+                
+                return `
+                    <div class="suggestion" onclick="selectProduct('${product.name}', '${product.category}', '${product.icon}', '${product.description}', ${product.custom || false})">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="font-size: 20px;">${product.icon}</div>
+                            <div>
+                                <div style="font-weight: 500;">${highlightedName}</div>
+                                <div style="font-size: 14px; color: #6b7280;">${highlightedDesc}</div>
+                                <div style="display: flex; gap: 6px; margin-top: 3px;">
+                                    <div style="font-size: 11px; background: #059669; color: white; padding: 2px 6px; border-radius: 10px; display: inline-block;">${product.category}</div>
+                                    ${product.custom ? '<div style="font-size: 10px; background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 8px;">Personnalisé</div>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            suggestions.style.display = 'block';
+            autoBtn.style.display = 'none';
+        }
+
+        function selectProduct(name, category, icon, description, isCustom = false) {
+            document.querySelector('.search-input').value = name;
+            document.getElementById('suggestions').style.display = 'none';
+            
+            const resultBox = document.getElementById('resultBox');
+            const colors = {
+                'Acide': '#dc2626', 'Base': '#2563eb', 'Toxique': '#7c3aed', 
+                'Peinture': '#059669', 'Organique': '#0d9488', 'Oxydant': '#eab308'
+            };
+            
+            resultBox.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                    <div style="font-size: 32px;">${icon}</div>
+                    <div>
+                        <div style="font-size: 18px; font-weight: bold;">${name}</div>
+                        <div style="color: #6b7280; font-size: 14px;">${description}</div>
+                        ${isCustom ? '<div style="background: #dcfce7; color: #166534; font-size: 11px; padding: 3px 8px; border-radius: 12px; display: inline-block; margin-top: 5px;">✨ Produit personnalisé</div>' : ''}
+                    </div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid ${colors[category]};">
+                    <div style="font-weight: bold; margin-bottom: 10px;">📊 Classification RDD:</div>
+                    <div style="background: ${colors[category]}; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; margin-bottom: 10px; display: inline-block;">
+                        📍 ${category}
+                    </div>
+                    <div style="background: #fefce8; border: 1px solid #fde047; padding: 12px; border-radius: 6px; margin-top: 15px;">
+                        <div style="font-weight: bold; color: #a16207; font-size: 14px; margin-bottom: 5px;">💡 Instructions de disposition:</div>
+                        <div style="font-size: 12px; color: #a16207;">
+                            Apportez ce produit à un écocentre ou point de collecte de résidus domestiques dangereux. Ne pas jeter aux ordures ménagères ou à l'égout.
+                        </div>
+                    </div>
+                </div>
+            `;
+            resultBox.style.display = 'block';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                const query = document.querySelector('.search-input').value.trim();
+                if (!query) return;
+                
+                const allProducts = getAllProducts();
+                const match = allProducts.find(p => 
+                    p.name.toLowerCase() === query.toLowerCase()
+                );
+                
+                if (match) {
+                    selectProduct(match.name, match.category, match.icon, match.description, match.custom);
+                } else {
+                    if (apiConfig.configured) {
+                        alert('🤖 Fonction IA DeepSeek à implémenter pour produits inconnus');
+                    } else {
+                        alert('❌ Produit non trouvé. Configurez DeepSeek AI pour analyser les produits inconnus.');
+                    }
+                }
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateCounts();
+            updateApiStatus();
+        });
+
+        // Fermer suggestions si clic ailleurs
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                document.getElementById('suggestions').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
